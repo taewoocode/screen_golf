@@ -19,6 +19,11 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	/**
+	 * 회원가
+	 * @param request
+	 * @return
+	 */
 	@Override
 	@Transactional
 	public User.UserSignUpResponse registerUser(User.UserSignUpRequest request) {
