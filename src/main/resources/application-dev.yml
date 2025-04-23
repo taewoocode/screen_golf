@@ -23,7 +23,7 @@ spring:
       display-request-duration: true
       groups-order: DESC
       operations-sorter: method
-      disable-swagger-default-url: false
+      disable-swagger가-default-url: false
       urls:
         - url: http://localhost:8080/v3/api-docs
           name: ScreenGolf API Docs
