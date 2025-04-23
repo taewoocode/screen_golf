@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: ${GOLF_DATASOURCE_DEV_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  springdoc:
+    default-consumes-media-type: application/json
+    default-produces-media-type: application/json
+    paths-to-match: /api/**
+    swagger-ui:
+      path: /api-test
+      display-request-duration: true
+      groups-order: DESC
+      operations-sorter: method
+      disable-swagger-default-url: false
+      urls:
+        - url: http://localhost:8080/v3/api-docs
+          name: ScreenGolf API Docs
+    api-docs:
+      groups:
+        enabled: true
