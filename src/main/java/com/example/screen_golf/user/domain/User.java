@@ -70,7 +70,8 @@ public class User {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public User(String email, String password, String name, String phone, UserRole role, UserStatus status, String profileImage) {
+	public User(String email, String password, String name, String phone, UserRole role, UserStatus status,
+		String profileImage) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
@@ -110,5 +111,28 @@ public class User {
 		private String email;
 		private String name;
 		private UserRole role;
+	}
+
+	/** ########## 회원조회 DTO ########## **/
+	@Getter
+	@NoArgsConstructor
+	public static class UserInfoRequest {
+		private Long userId;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class UserInfoResponse {
+		private Long userId;
+		private String email;
+		private String name;
+		private String phone;
+		private String profileImage;
+		private UserRole role;
+		private UserStatus status;
+		private LocalDateTime createdAt;
+		private LocalDateTime updatedAt;
 	}
 }
