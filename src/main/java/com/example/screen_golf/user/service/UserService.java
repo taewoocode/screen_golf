@@ -11,4 +11,18 @@ public interface UserService {
 	 */
 	User.UserSignUpResponse registerUser(User.UserSignUpRequest request);
 
+	/**
+	 * 유저 정보 가져오기
+	 * @param request
+	 * @return
+	 */
+	User.UserInfoResponse findUser(User.UserInfoRequest request);
+
+	/**
+	 * 이름으로 회원정보 조회하기
+	 * @param request
+	 * @return
+	 */
+	User.UserInfoNameResponse findUser(User.UserInfoNameRequest request);
+
 }
