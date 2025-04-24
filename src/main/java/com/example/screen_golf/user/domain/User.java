@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -116,6 +117,7 @@ public class User {
 	/** ########## 회원조회 DTO ########## **/
 	@Getter
 	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class UserInfoRequest {
 		private Long userId;
 	}
