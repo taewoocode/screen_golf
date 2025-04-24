@@ -104,4 +104,36 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("회원 정보 조회 중 오류가 발생했습니다.", e);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public User.UserInfoNameResponse findUser(User.UserInfoNameRequest request) {
+		try {
+			log.info("이름으로 회원 정보 조회 시작 - 이름: {}", request.getName());
+
+			User user = userRepository.findByName(request.getName())
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이름입니다."));
+
+			User.UserInfoNameResponse response = User.UserInfoNameResponse.builder()
+				.userId(user.getId())
+				.email(user.getEmail())
+				.name(user.getName())
+				.phone(user.getPhone())
+				.profileImage(user.getProfileImage())
+				.role(user.getRole())
+				.status(user.getStatus())
+				.createdAt(user.getCreatedAt())
+				.updatedAt(user.getUpdatedAt())
+				.build();
+
+			log.info("이름으로 회원 정보 조회 완료 - 사용자 ID: {}", response.getUserId());
+			return response;
+		} catch (IllegalArgumentException e) {
+			log.error("이름으로 회원 정보 조회 실패 (유효성 검사) - 이름: {}", request.getName(), e);
+			throw e;
+		} catch (Exception e) {
+			log.error("이름으로 회원 정보 조회 실패 (서버 오류) - 이름: {}", request.getName(), e);
+			throw new RuntimeException("이름으로 회원 정보 조회 중 오류가 발생했습니다.", e);
+		}
+	}
 }
