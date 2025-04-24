@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -127,6 +126,30 @@ public class User {
 	@AllArgsConstructor
 	@Builder
 	public static class UserInfoResponse {
+		private Long userId;
+		private String email;
+		private String name;
+		private String phone;
+		private String profileImage;
+		private UserRole role;
+		private UserStatus status;
+		private LocalDateTime createdAt;
+		private LocalDateTime updatedAt;
+	}
+
+	/** ########## 이름으로 회원조회 ########## **/
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UserInfoNameRequest {
+		private String name;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class UserInfoNameResponse {
 		private Long userId;
 		private String email;
 		private String name;
