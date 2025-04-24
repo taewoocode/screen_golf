@@ -80,4 +80,62 @@ public class Room {
 	public void changeStatus(RoomStatus status) {
 		this.status = status;
 	}
-} 
+
+	/**
+	 * ======================================================================
+	 * 								Room DTO
+	 * ======================================================================
+	 */
+
+	/**
+	 * Room조회 Dto
+	 */
+	@Getter
+	@Builder
+	public static class RoomResponse {
+		private Long id;
+		private String name;
+		private RoomStatus status;
+		private RoomType roomType;
+		private Integer pricePerHour;
+		private String description;
+		private LocalDateTime createdAt;
+		private LocalDateTime updateAt;
+
+		public static RoomResponse fromEntity(Room room) {
+			return RoomResponse.builder()
+				.id(room.getId())
+				.name(room.getName())
+				.status(room.getStatus())
+				.roomType(room.getRoomType())
+				.pricePerHour(room.getPricePerHour())
+				.description(room.getDescription())
+				.createdAt(room.getCreatedAt())
+				.updateAt(room.getUpdatedAt())
+				.build();
+		}
+	}
+
+	/**
+	 * Room 생성 요청 DTO
+	 */
+	@Getter
+	@Builder
+	public static class RoomCreateRequest {
+		private String name;
+		private RoomType roomType;
+		private Integer pricePerHour;
+		private String description;
+
+		// DTO -> Entity 변환 메서드
+		public Room toEntity() {
+			return Room.builder()
+				.name(this.name)
+				.status(RoomStatus.AVAILABLE) // 생성 시 기본적으로 사용 가능 상태로 설정
+				.pricePerHour(this.pricePerHour)
+				.description(this.description)
+				.build();
+		}
+	}
+
+}
