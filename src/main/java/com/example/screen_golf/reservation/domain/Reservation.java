@@ -103,8 +103,8 @@ public class Reservation {
 	@AllArgsConstructor
 	public static class ReservationBookingRequest {
 		private Long userId;
-		private Long roomId; // 예약 가능 방 검색 후 선택된 방의 ID
 		private LocalDate date;
+		private RoomType roomType;        // 예약할 때 선택한 룸 타입 (예: STANDARD, PREMIUM, VIP)
 		private LocalTime startTime;
 		private LocalTime endTime;
 		private String memo;
