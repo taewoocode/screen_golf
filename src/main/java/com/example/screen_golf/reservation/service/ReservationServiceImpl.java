@@ -7,8 +7,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.exception.reservation.ReservationConflictException;
+import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
 import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
 import com.example.screen_golf.reservation.repository.ReservationRepository;
@@ -30,34 +31,43 @@ public class ReservationServiceImpl implements ReservationService {
 	private final RoomRepository roomRepository;
 
 	@Override
-	@Transactional
 	public Reservation.ReservationResponse createReservation(Reservation.ReservationBookingRequest request) {
 		request.validateOperatingHours();
+
 		User user = userRepository.findById(request.getUserId())
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-		Room room = roomRepository.findById(request.getRoomId())
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
+			.orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다."));
 
-		LocalDateTime reservationStartDateTime = request.getReservationStartDateTime();
-		LocalDateTime reservationEndDateTime = request.getReservationEndDateTime();
-		List<ReservationStatus> activeStatus
-			= List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
+		LocalDateTime reservationStart = request.getReservationStartDateTime();
+		LocalDateTime reservationEnd = request.getReservationEndDateTime();
 
-		List<Reservation> overlappingResponse = reservationRepository.findOverlappingReservations(
-			room, reservationStartDateTime, reservationEndDateTime, activeStatus);
-		if (!overlappingResponse.isEmpty()) {
-			throw new IllegalArgumentException("선택한 예약 시간대가 이미 존재합니다.");
+		List<Room> availableRooms = roomRepository.findAvailableRoomByType(
+			request.getRoomType(), reservationStart, reservationEnd);
+
+		if (availableRooms.isEmpty()) {
+			throw new ResourceNotFoundException("해당 타입의 예약 가능한 방이 없습니다.");
 		}
 
-		Reservation reservationResponse = Reservation.builder()
+		// EX - LIST.get(0) VIP SELECT
+		Room selectedRoom = availableRooms.get(0);
+
+		List<ReservationStatus> activeStatuses = List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
+		List<Reservation> overlappingReservations =
+			reservationRepository.findOverlappingReservations(selectedRoom, reservationStart, reservationEnd,
+				activeStatuses);
+		if (!overlappingReservations.isEmpty()) {
+			throw new ReservationConflictException("선택한 시간대에 이미 예약이 존재합니다.");
+		}
+
+		Reservation reservation = Reservation.builder()
 			.user(user)
-			.room(room)
-			.startTime(reservationStartDateTime)
-			.endTime(reservationEndDateTime)
+			.room(selectedRoom)
+			.startTime(reservationStart)
+			.endTime(reservationEnd)
 			.memo(request.getMemo())
 			.build();
-		Reservation saveReservationResponse = reservationRepository.save(reservationResponse);
-		return Reservation.ReservationResponse.fromEntity(saveReservationResponse);
+
+		Reservation savedReservation = reservationRepository.save(reservation);
+		return Reservation.ReservationResponse.fromEntity(savedReservation);
 	}
 
 	@Override
