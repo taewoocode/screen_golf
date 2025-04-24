@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -80,4 +81,72 @@ public class Room {
 	public void changeStatus(RoomStatus status) {
 		this.status = status;
 	}
-} 
+
+	/**
+	 * ======================================================================
+	 * 								Room DTO
+	 * ======================================================================
+	 */
+
+	/**
+	 * Room조회 Dto
+	 */
+	@Getter
+	@Builder
+	public static class RoomResponse {
+		private Long id;
+		private String name;
+		private RoomStatus status;
+		private RoomType roomType;
+		private Integer pricePerHour;
+		private String description;
+		private LocalDateTime createdAt;
+		private LocalDateTime updateAt;
+
+		public static RoomResponse fromEntity(Room room) {
+			return RoomResponse.builder()
+				.id(room.getId())
+				.name(room.getName())
+				.status(room.getStatus())
+				.roomType(room.getRoomType())
+				.pricePerHour(room.getPricePerHour())
+				.description(room.getDescription())
+				.createdAt(room.getCreatedAt())
+				.updateAt(room.getUpdatedAt())
+				.build();
+		}
+	}
+
+	/**
+	 * Room 생성 요청 DTO
+	 */
+	@Getter
+	@Builder
+	public static class RoomCreateRequest {
+		private String name;
+		private RoomType roomType;
+		private Integer pricePerHour;
+		private String description;
+
+		// DTO -> Entity 변환 메서드
+		public Room toEntity() {
+			return Room.builder()
+				.name(this.name)
+				.status(RoomStatus.AVAILABLE)
+				.pricePerHour(this.pricePerHour)
+				.description(this.description)
+				.build();
+		}
+	}
+
+	/**
+	 * RoomType으로 조회
+	 */
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class RoomTypeRequest {
+		private RoomType roomType;
+	}
+}

@@ -38,4 +38,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 		@Param("startTime") LocalDateTime startTime,
 		@Param("endTime") LocalDateTime endTime);
 
+	/**
+	 * Type 필터회
+	 * @param roomType
+	 * @return
+	 */
+	List<Room> findByRoomType(RoomType roomType);
+
 }

@@ -32,4 +32,28 @@ public class SwaggerDocs {
 	public static final String SUMMARY_RESERVATION_GET_USER_RESERVATIONS = "사용자 예약 내역 조회";
 	public static final String DESCRIPTION_RESERVATION_GET_USER_RESERVATIONS =
 		"특정 사용자 ID를 기준으로 해당 사용자의 예약 내역 목록을 조회합니다.";
-} 
+
+	/**===================================================================
+	 *                   Room 관련 Swagger Docs
+	 * ===================================================================
+	 */
+	public static final String SUMMARY_ROOM_LIST = "전체 Room 목록 조회";
+	public static final String DESCRIPTION_ROOM_LIST =
+		"이용 가능, 예약 중, 사용 중 등 모든 Room의 상세 정보를 조회합니다.";
+
+	public static final String SUMMARY_ROOM_BY_TYPE = "Room 타입으로 조회";
+	public static final String DESCRIPTION_ROOM_BY_TYPE =
+		"RoomType 요청 DTO를 입력받아 해당 타입에 해당하는 Room 목록을 조회합니다.";
+
+	public static final String SUMMARY_ROOM_DETAIL = "Room 상세 조회";
+	public static final String DESCRIPTION_ROOM_DETAIL =
+		"Room ID를 기반으로 특정 Room의 상세 정보를 조회합니다.";
+
+	/**===================================================================
+	 *                   UserCoupon 관련 Swagger Docs
+	 * ===================================================================
+	 */
+	public static final String SUMMARY_CREATE_USER_COUPON = "사용자 쿠폰 생성";
+	public static final String DESCRIPTION_CREATE_USER_COUPON =
+		"사용자 ID와 쿠폰 정보를 입력받아 사용자에게 쿠폰을 발급합니다.";
+}
