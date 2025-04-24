@@ -48,4 +48,12 @@ public class SwaggerDocs {
 	public static final String SUMMARY_ROOM_DETAIL = "Room 상세 조회";
 	public static final String DESCRIPTION_ROOM_DETAIL =
 		"Room ID를 기반으로 특정 Room의 상세 정보를 조회합니다.";
-} 
+
+	/**===================================================================
+	 *                   UserCoupon 관련 Swagger Docs
+	 * ===================================================================
+	 */
+	public static final String SUMMARY_CREATE_USER_COUPON = "사용자 쿠폰 생성";
+	public static final String DESCRIPTION_CREATE_USER_COUPON =
+		"사용자 ID와 쿠폰 정보를 입력받아 사용자에게 쿠폰을 발급합니다.";
+}
