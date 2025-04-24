@@ -1,6 +1,11 @@
 package com.example.screen_golf.swagger;
 
 public class SwaggerDocs {
+
+	/**===================================================================
+	 *					 User 관련 Swagger Docs
+	 * ===================================================================
+	 */
 	public static final String SUMMARY_USER_SIGNUP = "회원가입";
 	public static final String DESCRIPTION_USER_SIGNUP = "이메일, 비밀번호, 이름, 전화번호, 프로필 이미지를 입력하여 회원가입을 진행합니다.";
 
@@ -9,4 +14,22 @@ public class SwaggerDocs {
 
 	public static final String SUMMARY_USER_INFO_BY_NAME = "이름으로 회원 정보 조회";
 	public static final String DESCRIPTION_USER_INFO_BY_NAME = "사용자 이름을 통해 회원 정보를 조회합니다.";
+
+	/**===================================================================
+	 *					 Reservation 관련 Swagger Docs
+	 * ===================================================================
+	 */
+	public static final String SUMMARY_RESERVATION_CREATE = "예약 생성";
+	public static final String DESCRIPTION_RESERVATION_CREATE =
+		"예약 진행 요청 DTO를 입력받아 예약 가능한 방을 선택한 후, 예약을 생성합니다. " +
+			"운영시간(11:00 ~ 22:00) 내에 예약이 진행되어야 하며, 겹치는 예약이 있는 경우 에러를 반환합니다.";
+
+	public static final String SUMMARY_RESERVATION_SEARCH_AVAILABLE = "예약 가능한 방 검색";
+	public static final String DESCRIPTION_RESERVATION_SEARCH_AVAILABLE =
+		"특정 날짜, 예약 시작/종료 시간, 그리고 원하는 룸 타입(STANDARD, PREMIUM, VIP)을 입력하여 " +
+			"예약 가능한 방의 목록을 조회합니다. 운영시간 내 검색이 진행됩니다.";
+
+	public static final String SUMMARY_RESERVATION_GET_USER_RESERVATIONS = "사용자 예약 내역 조회";
+	public static final String DESCRIPTION_RESERVATION_GET_USER_RESERVATIONS =
+		"특정 사용자 ID를 기준으로 해당 사용자의 예약 내역 목록을 조회합니다.";
 } 
