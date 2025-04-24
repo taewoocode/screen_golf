@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -131,11 +132,20 @@ public class Room {
 		public Room toEntity() {
 			return Room.builder()
 				.name(this.name)
-				.status(RoomStatus.AVAILABLE) // 생성 시 기본적으로 사용 가능 상태로 설정
+				.status(RoomStatus.AVAILABLE)
 				.pricePerHour(this.pricePerHour)
 				.description(this.description)
 				.build();
 		}
 	}
 
+	/**
+	 * RoomType으로 조회
+	 */
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class RoomTypeRequest {
+		private RoomType roomType;
+	}
 }
