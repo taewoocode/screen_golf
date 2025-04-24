@@ -12,10 +12,10 @@ public interface UserService {
 	User.UserSignUpResponse registerUser(User.UserSignUpRequest request);
 
 	/**
-	 * 유저조회
+	 * 유저 정보 가져오기
 	 * @param request
 	 * @return
 	 */
-	User.UserInfoResponse findUser(User.UserSignUpRequest request);
+	User.UserInfoResponse findUser(User.UserInfoRequest request);
 
 }
