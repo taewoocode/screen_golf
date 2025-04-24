@@ -11,4 +11,11 @@ public interface UserService {
 	 */
 	User.UserSignUpResponse registerUser(User.UserSignUpRequest request);
 
+	/**
+	 * 유저조회
+	 * @param request
+	 * @return
+	 */
+	User.UserInfoResponse findUser(User.UserSignUpRequest request);
+
 }
