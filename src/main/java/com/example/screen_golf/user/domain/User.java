@@ -137,7 +137,7 @@ public class User {
 		private LocalDateTime updatedAt;
 	}
 
-	/** ########## 이름으로 회원조회 ########## **/
+	/** ########## 이름으로 회원조회 DTO ########## **/
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
