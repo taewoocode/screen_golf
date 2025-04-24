@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -101,7 +102,7 @@ public class UserCoupon {
 
 	@Getter
 	@NoArgsConstructor
-	public class UserCouponCreateRequest {
+	public static class UserCouponCreateRequest {
 
 		private Long userId;         // 사용자 ID
 		private String couponCode;   // 쿠폰 코드
@@ -109,15 +110,21 @@ public class UserCoupon {
 		private Integer discountAmount; // 할인 금액
 		private LocalDateTime validFrom; // 쿠폰 유효 시작일
 		private LocalDateTime validTo;   // 쿠폰 유효 종료일
+	}
 
-		@Builder
-		public UserCouponCreateRequest(Long userId, String couponCode, String name,
-			Integer discountAmount, LocalDateTime validFrom, LocalDateTime validTo) {
-			this.userId = userId;
-			this.couponCode = couponCode;
-			this.name = name;
-			this.discountAmount = discountAmount;
-			this.validFrom = validFrom;
-			this.validTo = validTo;
-		}
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class UserCouponCreateResponse {
+
+		private Long userCouponId;   // 생성된 쿠폰 ID
+		private Long userId;         // 사용자 ID
+		private String couponCode;   // 쿠폰 코드
+		private String name;         // 쿠폰 이름
+		private Integer discountAmount; // 할인 금액
+		private LocalDateTime validFrom; // 쿠폰 유효 시작일
+		private LocalDateTime validTo;   // 쿠폰 유효 종료일
+		private LocalDateTime createdAt; // 생성일시
+	}
 } 
