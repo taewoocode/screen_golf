@@ -3,6 +3,9 @@ package com.example.screen_golf.reservation.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +52,7 @@ public class ReservationController {
 		summary = SwaggerDocs.SUMMARY_RESERVATION_SEARCH_AVAILABLE,
 		description = SwaggerDocs.DESCRIPTION_RESERVATION_SEARCH_AVAILABLE
 	)
+	@PostMapping("/available")
 	public ResponseEntity<List<Reservation.AvailableRoomResponse>> searchAvailableRooms(
 		@Parameter(description = "예약 가능한 방 검색 요청 DTO", required = true)
 		@RequestBody Reservation.ReservationSearchRequest request) {
@@ -56,5 +60,22 @@ public class ReservationController {
 		log.info("예약 가능한 방 검색 성공 - 조건: 날짜={}, 시작시간={}, 종료시간={}, 룸 타입={}",
 			request.getDate(), request.getDesiredStartTime(), request.getDesiredEndTime(), request.getRoomType());
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * 사용자 별 예약 내역 조회
+	 * 특정 사용자 ID를 기반으로 해당 사용자의 예약 내역을 조회합니다.
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_RESERVATION_GET_USER_RESERVATIONS,
+		description = SwaggerDocs.DESCRIPTION_RESERVATION_GET_USER_RESERVATIONS
+	)
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<Reservation.ReservationResponse>> getUserReservations(
+		@Parameter(description = "조회할 사용자 ID", required = true)
+		@PathVariable("userId") Long userId) {
+		List<Reservation.ReservationResponse> responses = reservationService.getUserReservations(userId);
+		log.info("사용자 예약 내역 조회 성공 - 사용자 ID: {}", userId);
+		return ResponseEntity.ok(responses);
 	}
 }
