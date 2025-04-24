@@ -1,5 +1,7 @@
 package com.example.screen_golf.reservation.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,5 +39,22 @@ public class ReservationController {
 		Reservation.ReservationResponse reservation = reservationService.createReservation(request);
 		log.info("예약 성공 - 예약 ID ={}", reservation);
 		return ResponseEntity.ok(reservation);
+	}
+
+	/**
+	 * 예약 가능한 방 검색
+	 * 원하는 날짜, 시간대, 룸 타입 조건에 맞춰 예약 가능한 방을 조회
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_RESERVATION_SEARCH_AVAILABLE,
+		description = SwaggerDocs.DESCRIPTION_RESERVATION_SEARCH_AVAILABLE
+	)
+	public ResponseEntity<List<Reservation.AvailableRoomResponse>> searchAvailableRooms(
+		@Parameter(description = "예약 가능한 방 검색 요청 DTO", required = true)
+		@RequestBody Reservation.ReservationSearchRequest request) {
+		List<Reservation.AvailableRoomResponse> response = reservationService.searchAvailableRooms(request);
+		log.info("예약 가능한 방 검색 성공 - 조건: 날짜={}, 시작시간={}, 종료시간={}, 룸 타입={}",
+			request.getDate(), request.getDesiredStartTime(), request.getDesiredEndTime(), request.getRoomType());
+		return ResponseEntity.ok(response);
 	}
 }
