@@ -32,48 +32,52 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public class Room {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String name;
+	@Column(nullable = false)
+	private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RoomStatus status;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private RoomStatus status;
 
-    @Column(nullable = false)
-    private Integer pricePerHour;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private RoomType roomType;
 
-    private String description;
+	@Column(nullable = false)
+	private Integer pricePerHour;
 
-    @OneToMany(mappedBy = "room")
-    private List<Reservation> reservations = new ArrayList<>();
+	private String description;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+	@OneToMany(mappedBy = "room")
+	private List<Reservation> reservations = new ArrayList<>();
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+	@CreatedDate
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    @Builder
-    public Room(String name, RoomStatus status, Integer pricePerHour, String description) {
-        this.name = name;
-        this.status = status;
-        this.pricePerHour = pricePerHour;
-        this.description = description;
-    }
+	@LastModifiedDate
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
 
-    public void updateRoomInfo(String name, Integer pricePerHour, String description) {
-        this.name = name;
-        this.pricePerHour = pricePerHour;
-        this.description = description;
-    }
+	@Builder
+	public Room(String name, RoomStatus status, Integer pricePerHour, String description) {
+		this.name = name;
+		this.status = status;
+		this.pricePerHour = pricePerHour;
+		this.description = description;
+	}
 
-    public void changeStatus(RoomStatus status) {
-        this.status = status;
-    }
+	public void updateRoomInfo(String name, Integer pricePerHour, String description) {
+		this.name = name;
+		this.pricePerHour = pricePerHour;
+		this.description = description;
+	}
+
+	public void changeStatus(RoomStatus status) {
+		this.status = status;
+	}
 } 
