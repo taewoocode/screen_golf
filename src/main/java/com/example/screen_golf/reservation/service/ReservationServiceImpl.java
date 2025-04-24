@@ -1,7 +1,10 @@
 package com.example.screen_golf.reservation.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +13,7 @@ import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
 import com.example.screen_golf.reservation.repository.ReservationRepository;
 import com.example.screen_golf.room.domain.Room;
+import com.example.screen_golf.room.domain.RoomType;
 import com.example.screen_golf.room.respository.RoomRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
@@ -58,11 +62,29 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	public List<Reservation.AvailableRoomResponse> searchAvailableRooms(Reservation.ReservationSearchRequest request) {
-		return null;
+		//예약 조회
+		request.validateOperatingHours();
+		LocalDateTime reservationStartDateTime = request.getReservationStartDateTime();
+		LocalDateTime reservationEndDateTime = request.getReservationEndDateTime();
+		RoomType roomType = request.getRoomType();
+
+		List<Reservation> reservationRoomType =
+			reservationRepository.findReservationsByOperatingHoursAndRoomType(
+				reservationStartDateTime, reservationEndDateTime, roomType);
+
+		return reservationRoomType.stream()
+			.map(r -> Reservation.AvailableRoomResponse.fromRoom(r.getRoom()))
+			.collect(Collectors.collectingAndThen(
+				Collectors.toMap(Reservation.AvailableRoomResponse::getRoomId, Function.identity(), (a, b) -> a),
+				map -> new ArrayList<>(map.values())
+			));
 	}
 
 	@Override
 	public List<Reservation.ReservationResponse> getUserReservations(Long userId) {
-		return null;
+		List<Reservation> reservations = reservationRepository.findByUserId(userId);
+		return reservations.stream()
+			.map(Reservation.ReservationResponse::fromEntity)
+			.collect(Collectors.toList());
 	}
 }
