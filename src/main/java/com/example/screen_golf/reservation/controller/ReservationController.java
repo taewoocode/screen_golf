@@ -64,7 +64,7 @@ public class ReservationController {
 
 	/**
 	 * 사용자 별 예약 내역 조회
-	 * 특정 사용자 ID를 기반으로 해당 사용자의 예약 내역을 조회합니다.
+	 * 특정 사용자 ID를 기반으로 해당 사용자의 예약 내역을 조회
 	 */
 	@Operation(
 		summary = SwaggerDocs.SUMMARY_RESERVATION_GET_USER_RESERVATIONS,
