@@ -143,6 +143,7 @@ public class Room {
 	 * RoomType으로 조회
 	 */
 	@Builder
+	@Getter
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class RoomTypeRequest {
