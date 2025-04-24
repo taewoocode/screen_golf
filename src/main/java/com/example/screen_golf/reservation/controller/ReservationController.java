@@ -16,13 +16,15 @@ import com.example.screen_golf.swagger.SwaggerDocs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "Reservation", description = "예약 관련 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/reservations")
+@RequestMapping("/api/reservations")
 public class ReservationController {
 
 	private final ReservationService reservationService;
@@ -36,6 +38,7 @@ public class ReservationController {
 		summary = SwaggerDocs.SUMMARY_RESERVATION_CREATE,
 		description = SwaggerDocs.DESCRIPTION_RESERVATION_CREATE
 	)
+	@PostMapping
 	public ResponseEntity<Reservation.ReservationResponse> createReservation(
 		@Parameter(description = "예약 진행 요청 DTO", required = true)
 		@RequestBody Reservation.ReservationBookingRequest request) {
@@ -57,8 +60,9 @@ public class ReservationController {
 		@Parameter(description = "예약 가능한 방 검색 요청 DTO", required = true)
 		@RequestBody Reservation.ReservationSearchRequest request) {
 		List<Reservation.AvailableRoomResponse> response = reservationService.searchAvailableRooms(request);
-		log.info("예약 가능한 방 검색 성공 - 조건: 날짜={}, 시작시간={}, 종료시간={}, 룸 타입={}",
-			request.getDate(), request.getDesiredStartTime(), request.getDesiredEndTime(), request.getRoomType());
+		log.info("예약 가능한 방 검색 성공 - 조건: 날짜={}, 시작시간={}, 종료시간={}, 룸 타입={},남은 방 갯수={}",
+			request.getDate(), request.getDesiredStartTime(), request.getDesiredEndTime(), request.getRoomType(),
+			response.size());
 		return ResponseEntity.ok(response);
 	}
 
