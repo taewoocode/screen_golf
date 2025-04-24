@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
 import com.example.screen_golf.exception.reservation.ReservationValidationException;
 import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
+import com.example.screen_golf.exception.room.RoomNotFoundException;
+import com.example.screen_golf.exception.room.RoomStateException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,4 +51,24 @@ public class GlobalExceptionHandler {
 		log.error("리소스 조회 실패: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 	}
+
+	/**=========================================================================
+	 *                           Room 관련
+	 * =========================================================================
+	 */
+
+	// 예: Room을 조회하지 못했을 때 발생하는 예외 처리 (RoomNotFoundException)
+	@ExceptionHandler(RoomNotFoundException.class)
+	public ResponseEntity<String> handleRoomNotFoundException(RoomNotFoundException e) {
+		log.error("Room 조회 실패: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	}
+
+	// 예: Room의 상태나 비즈니스 로직 관련 예외가 있다면 추가 핸들러 작성 가능
+	@ExceptionHandler(RoomStateException.class)
+	public ResponseEntity<String> handleRoomStateException(RoomStateException e) {
+		log.error("Room 상태 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	}
+
 }
