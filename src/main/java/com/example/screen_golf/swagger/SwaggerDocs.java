@@ -49,6 +49,10 @@ public class SwaggerDocs {
 	public static final String DESCRIPTION_ROOM_DETAIL =
 		"Room ID를 기반으로 특정 Room의 상세 정보를 조회합니다.";
 
+	public static final String SUMMARY_ROOM_CREATE = "Room 생성";
+	public static final String DESCRIPTION_CREATE_ROOM =
+		"Room ID를 기반으로 특정 Room의 상세 정보를 조회합니다.";
+
 	/**===================================================================
 	 *                   UserCoupon 관련 Swagger Docs
 	 * ===================================================================
