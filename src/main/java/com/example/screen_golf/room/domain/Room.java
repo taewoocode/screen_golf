@@ -84,6 +84,19 @@ public class Room {
 		this.status = status;
 	}
 
+	public boolean canChangeStatusTo(RoomStatus newStatus) {
+		if (this.status == newStatus)
+			return true; // 같은 상태면 허용
+
+		return switch (this.status) {
+			case AVAILABLE -> newStatus == RoomStatus.RESERVED || newStatus == RoomStatus.MAINTENANCE;
+			case RESERVED -> newStatus == RoomStatus.IN_USE || newStatus == RoomStatus.AVAILABLE;
+			case IN_USE -> newStatus == RoomStatus.AVAILABLE || newStatus == RoomStatus.MAINTENANCE;
+			case MAINTENANCE -> newStatus == RoomStatus.AVAILABLE;
+		};
+	}
+
+
 	/* ======================================================================
 	 *                         	Room DTO 관련
 	 * ======================================================================
@@ -239,4 +252,5 @@ public class Room {
 				.build();
 		}
 	}
+
 }
