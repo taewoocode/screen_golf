@@ -55,7 +55,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public Room.RoomResponse createRoomTypeVIP(Room.RoomCreateRequest createRequest) {
+	public Room.RoomResponse createRoom(Room.RoomCreateRequest createRequest) {
 
 		if (roomRepository.existsByName(createRequest.getName())) {
 			throw new RoomStateException("이미 존재하는 룸 이름입니다.");
