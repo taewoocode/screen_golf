@@ -1,9 +1,12 @@
 package com.example.screen_golf.reservation.service;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.reservation.domain.Reservation;
@@ -35,7 +39,7 @@ class ReservationServiceImplTest {
 
 	@Mock
 	private DiscountPolicy discountPolicy; // DiscountPolicy Mock
-
+	private final DiscountPolicy discountPolicy2 = new RateAmountCountPolicy();
 	@Mock
 	private UserRepository userRepository; // 추가된 의존성
 
@@ -155,4 +159,24 @@ class ReservationServiceImplTest {
 		verify(discountPolicy, times(1)).applyDiscount(any(BigDecimal.class), any(UserCoupon.class));
 	}
 
+	@Test
+	@DisplayName("비율할인_정책_적용_테스트")
+	void rateDiscountPolicy_할인계산_테스트() throws NoSuchMethodException, InstantiationException,
+		IllegalAccessException, InvocationTargetException {
+		BigDecimal originalPrice = BigDecimal.valueOf(10000);
+
+		Constructor<UserCoupon> constructor = UserCoupon.class.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		UserCoupon coupon = constructor.newInstance();
+
+		//할인율 10퍼센트 적용
+		ReflectionTestUtils.setField(coupon, "discountAmount", 10);
+
+		DiscountPolicy discountPolicy = new RateAmountCountPolicy();
+
+		BigDecimal calculatedPrice = discountPolicy.applyDiscount(originalPrice, coupon);
+		BigDecimal expectedPrice = BigDecimal.valueOf(9000.0);
+
+		assertEquals(expectedPrice, calculatedPrice);
+	}
 }
