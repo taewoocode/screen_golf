@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.Room.RoomResponse;
 import com.example.screen_golf.room.domain.Room.RoomTypeRequest;
 import com.example.screen_golf.room.service.RoomService;
@@ -78,5 +79,20 @@ public class RoomController {
 		RoomResponse response = roomService.findById(id);
 		log.info("Room 상세 조회 성공 - Room ID: {}", id);
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * Room 생성
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_ROOM_CREATE,
+		description = SwaggerDocs.DESCRIPTION_CREATE_ROOM
+	)
+	public ResponseEntity<RoomResponse> createRoomRequest(
+		@Parameter(description = "룸 생성 요청", required = true)
+		@RequestBody Room.RoomCreateRequest request) {
+		RoomResponse room = roomService.createRoom(request);
+		log.info("Room 생성 성공={}", room);
+		return ResponseEntity.ok(room);
 	}
 }
