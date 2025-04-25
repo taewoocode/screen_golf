@@ -36,6 +36,7 @@ public class UserCoupon {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/** FK ** -> USER_ID **/
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
@@ -103,7 +104,6 @@ public class UserCoupon {
 	@Getter
 	@NoArgsConstructor
 	public static class UserCouponCreateRequest {
-
 		private Long userId;         // 사용자 ID
 		private String couponCode;   // 쿠폰 코드
 		private String name;         // 쿠폰 이름
@@ -121,7 +121,7 @@ public class UserCoupon {
 		private Long userCouponId;   // 생성된 쿠폰 ID
 		private Long userId;         // 사용자 ID
 		private String couponCode;   // 쿠폰 코드
-		private String name;         // 쿠폰 이름
+		private String getCouponName;         // 쿠폰 이름
 		private Integer discountAmount; // 할인 금액
 		private LocalDateTime validFrom; // 쿠폰 유효 시작일
 		private LocalDateTime validTo;   // 쿠폰 유효 종료일
