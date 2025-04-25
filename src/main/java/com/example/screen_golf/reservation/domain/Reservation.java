@@ -99,6 +99,7 @@ public class Reservation {
 	 * 운영시간(11:00 ~ 22:00) 내에서 예약을 진행해야 하며, 예약 진행 날짜와 시간이 제공된다.
 	 */
 	@Getter
+	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class ReservationBookingRequest {
