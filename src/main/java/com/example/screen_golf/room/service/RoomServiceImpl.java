@@ -93,8 +93,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	private Room validationRoom(Long updateRequest) {
-		Room room = roomRepository.findById(updateRequest)
+		return roomRepository.findById(updateRequest)
 			.orElseThrow(() -> new RoomNotFoundException("해당 룸을 찾을 수 없습니다."));
-		return room;
 	}
 }
