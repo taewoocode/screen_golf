@@ -21,4 +21,9 @@ public class DiscountPolicyConfig {
 	public DiscountPolicy rateAmountDiscountPolicy() {
 		return new RateAmountCountPolicy();
 	}
+
+	/**==================================================
+	 *  		운영정책에 따라 쿠폰은 추가됩니다.
+	 * ==================================================
+	 */
 }
