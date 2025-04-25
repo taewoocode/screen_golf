@@ -18,6 +18,11 @@ public class UserCouponServiceImpl implements UserCouponService {
 	private final UserCouponRepository userCouponRepository;
 	private final UserRepository userRepository;
 
+	/**
+	 * 쿠폰생성
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public UserCoupon.UserCouponCreateResponse createCoupon(UserCoupon.UserCouponCreateRequest request) {
 		User user = validateUser(request);
@@ -31,7 +36,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 			.userCouponId(savedCoupon.getId())
 			.userId(user.getId())
 			.couponCode(savedCoupon.getCouponCode())
-			.name(savedCoupon.getName())
+			.getCouponName(savedCoupon.getName())
 			.discountAmount(savedCoupon.getDiscountAmount())
 			.validFrom(savedCoupon.getValidFrom())
 			.validTo(savedCoupon.getValidTo())
@@ -40,7 +45,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 	}
 
 	private static UserCoupon makeUserEntity(UserCoupon.UserCouponCreateRequest request, User user) {
-		UserCoupon userCoupon = UserCoupon.builder()
+		return UserCoupon.builder()
 			.user(user)
 			.couponCode(request.getCouponCode())
 			.name(request.getName())
@@ -48,7 +53,6 @@ public class UserCouponServiceImpl implements UserCouponService {
 			.validFrom(request.getValidFrom())
 			.validTo(request.getValidTo())
 			.build();
-		return userCoupon;
 	}
 
 	private User validateUser(UserCoupon.UserCouponCreateRequest request) {
