@@ -5,7 +5,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.screen_golf.exception.room.RoomNotFoundException;
+import com.example.screen_golf.exception.room.RoomStateException;
 import com.example.screen_golf.room.domain.Room;
+import com.example.screen_golf.room.domain.RoomStatus;
 import com.example.screen_golf.room.domain.RoomType;
 import com.example.screen_golf.room.respository.RoomRepository;
 
@@ -47,9 +50,51 @@ public class RoomServiceImpl implements RoomService {
 
 	@Override
 	public Room.RoomResponse findById(Long id) {
-		Room room = roomRepository.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("해당 룸을 찾을 수 없습니다."));
+		Room room = validationRoom(id);
 		return Room.RoomResponse.fromEntity(room);
 	}
 
+	@Override
+	public Room.RoomResponse createRoomTypeVIP(Room.RoomCreateRequest createRequest) {
+
+		if (roomRepository.existsByName(createRequest.getName())) {
+			throw new RoomStateException("이미 존재하는 룸 이름입니다.");
+		}
+		if (roomRepository.findByName(createRequest.getName())
+			.map(room -> room.getStatus() == RoomStatus.IN_USE)
+			.orElse(false)) {
+			throw new RoomStateException("해당 룸은 현재 사용 중입니다.");
+		}
+
+		Room savedRoom = roomRepository.save(createRequest.toEntity(RoomStatus.IN_USE));
+		Room savedCreateRoomTypeVIP = roomRepository.save(savedRoom);
+		return Room.RoomResponse.fromEntity(savedCreateRoomTypeVIP);
+	}
+
+	@Override
+	public Room.RoomResponse updateRoom(Room.RoomUpdateRequest updateRequest) {
+		Room room = validationRoom(updateRequest.getId());
+		updateRequest.apply(room);
+		return Room.RoomResponse.fromEntity(room);
+	}
+
+	@Override
+	public Room.RoomResponse changeRoomStatus(Long id, RoomStatus newStatus) {
+		Room room = validationRoom(id);
+		room.changeStatus(newStatus);
+		return Room.RoomResponse.fromEntity(room);
+	}
+
+	@Override
+	public Room.RoomDeleteResponse deleteRoom(Long id) {
+		Room room = validationRoom(id);
+		roomRepository.delete(room);
+		return Room.RoomDeleteResponse.fromEntity(room);
+	}
+
+	private Room validationRoom(Long updateRequest) {
+		Room room = roomRepository.findById(updateRequest)
+			.orElseThrow(() -> new RoomNotFoundException("해당 룸을 찾을 수 없습니다."));
+		return room;
+	}
 }

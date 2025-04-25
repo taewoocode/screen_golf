@@ -2,6 +2,7 @@ package com.example.screen_golf.room.respository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,5 +45,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 	 * @return
 	 */
 	List<Room> findByRoomType(RoomType roomType);
+
+	/**
+	 * 이름 중복 체크
+	 * @param name
+	 * @return
+	 */
+	boolean existsByName(String name);
+
+	Optional<Room> findByName(String name);
 
 }
