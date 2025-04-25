@@ -36,7 +36,7 @@ public interface RoomService {
 	 * @param createRequest Room 생성
 	 * @return 생성된 Room의 정보를 담은 RoomResponse DTO
 	 */
-	Room.RoomResponse createRoomTypeVIP(Room.RoomCreateRequest createRequest);
+	Room.RoomResponse createRoom(Room.RoomCreateRequest createRequest);
 
 	/**
 	 * 기존 Room의 정보를 수정합니다.
