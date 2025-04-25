@@ -3,16 +3,20 @@ package com.example.screen_golf.room.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.Room.RoomResponse;
 import com.example.screen_golf.room.domain.Room.RoomTypeRequest;
+import com.example.screen_golf.room.domain.RoomStatus;
 import com.example.screen_golf.room.service.RoomService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
@@ -88,11 +92,47 @@ public class RoomController {
 		summary = SwaggerDocs.SUMMARY_ROOM_CREATE,
 		description = SwaggerDocs.DESCRIPTION_CREATE_ROOM
 	)
+	@PostMapping("/create")
 	public ResponseEntity<RoomResponse> createRoomRequest(
 		@Parameter(description = "룸 생성 요청", required = true)
 		@RequestBody Room.RoomCreateRequest request) {
 		RoomResponse room = roomService.createRoom(request);
 		log.info("Room 생성 성공={}", room);
 		return ResponseEntity.ok(room);
+	}
+
+	/**
+	 * Room 상태 변경
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_ROOM_STATUS_CHANGE,
+		description = SwaggerDocs.DESCRIPTION_ROOM_STATUS_CHANGE
+	)
+	@PutMapping("/{id}/status")
+	public ResponseEntity<Room.RoomResponse> changeRoomStatus(
+		@Parameter(description = "상태를 변경할 Room ID", required = true)
+		@PathVariable Long id,
+
+		@Parameter(description = "변경할 Room 상태", required = true)
+		@RequestParam RoomStatus newStatus) {
+
+		Room.RoomResponse roomResponse = roomService.changeRoomStatus(id, newStatus);
+		return ResponseEntity.ok(roomResponse);
+	}
+
+	/**
+	 * Room 삭제
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_ROOM_DELETE,
+		description = SwaggerDocs.DESCRIPTION_ROOM_DELETE
+	)
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Room.RoomDeleteResponse> deleteRoom(
+		@Parameter(description = "삭제할 Room ID", required = true)
+		@PathVariable Long id) {
+
+		Room.RoomDeleteResponse response = roomService.deleteRoom(id);
+		return ResponseEntity.ok(response);
 	}
 }
