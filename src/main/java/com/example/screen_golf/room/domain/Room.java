@@ -82,43 +82,14 @@ public class Room {
 		this.status = status;
 	}
 
-	/**
-	 * ======================================================================
-	 * 								Room DTO
+	/* ======================================================================
+	 *                          Room CRUD DTOs
 	 * ======================================================================
 	 */
-
-	/**
-	 * Room조회 Dto
-	 */
-	@Getter
-	@Builder
-	public static class RoomResponse {
-		private Long id;
-		private String name;
-		private RoomStatus status;
-		private RoomType roomType;
-		private Integer pricePerHour;
-		private String description;
-		private LocalDateTime createdAt;
-		private LocalDateTime updateAt;
-
-		public static RoomResponse fromEntity(Room room) {
-			return RoomResponse.builder()
-				.id(room.getId())
-				.name(room.getName())
-				.status(room.getStatus())
-				.roomType(room.getRoomType())
-				.pricePerHour(room.getPricePerHour())
-				.description(room.getDescription())
-				.createdAt(room.getCreatedAt())
-				.updateAt(room.getUpdatedAt())
-				.build();
-		}
-	}
 
 	/**
 	 * Room 생성 요청 DTO
+	 * 클라이언트로부터 생성할 데이터만 받아 엔티티로 변환하는 역할을 합니다.
 	 */
 	@Getter
 	@Builder
@@ -132,7 +103,7 @@ public class Room {
 		public Room toEntity() {
 			return Room.builder()
 				.name(this.name)
-				.status(RoomStatus.AVAILABLE)
+				.status(RoomStatus.AVAILABLE)  // 생성 시 기본 상태 처리
 				.pricePerHour(this.pricePerHour)
 				.description(this.description)
 				.build();
@@ -140,13 +111,82 @@ public class Room {
 	}
 
 	/**
-	 * RoomType으로 조회
+	 * Room 조회 응답 DTO
+	 * Room 엔티티의 정보를 클라이언트에 제공하기 위한 데이터 포맷입니다.
 	 */
-	@Builder
 	@Getter
+	@Builder
+	public static class RoomResponse {
+		private Long id;
+		private String name;
+		private RoomStatus status;
+		private RoomType roomType;
+		private Integer pricePerHour;
+		private String description;
+		private LocalDateTime createdAt;
+		private LocalDateTime updatedAt;
+
+		public static RoomResponse fromEntity(Room room) {
+			return RoomResponse.builder()
+				.id(room.getId())
+				.name(room.getName())
+				.status(room.getStatus())
+				.roomType(room.getRoomType())
+				.pricePerHour(room.getPricePerHour())
+				.description(room.getDescription())
+				.createdAt(room.getCreatedAt())
+				.updatedAt(room.getUpdatedAt())
+				.build();
+		}
+	}
+
+	/**
+	 * Room 수정 요청 DTO
+	 * 업데이트 시 계층 간 전송할 데이터를 정의하며, 엔티티의 특정 필드를 변경할 때 사용됩니다.
+	 */
+	@Getter
+	@Builder
+	public static class RoomUpdateRequest {
+		private String name;
+		private Integer pricePerHour;
+		private String description;
+		// 필요 시 roomType이나 status 업데이트도 포함할 수 있습니다.
+
+		/**
+		 * 해당 DTO의 값을 Room 엔티티에 반영하는 헬퍼 메서드
+		 */
+		public void apply(Room room) {
+			room.updateRoomInfo(this.name, this.pricePerHour, this.description);
+		}
+	}
+
+	/**
+	 * Room 타입으로 조회 요청 DTO
+	 * 클라이언트가 특정 Room 타입을 기반으로 조회할 때 사용됩니다.
+	 */
+	@Getter
+	@Builder
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class RoomTypeRequest {
 		private RoomType roomType;
+	}
+
+	/**
+	 * Room 삭제 응답 DTO (선택)
+	 * 삭제 작업 후 클라이언트에 제공할 정보를 담습니다.
+	 */
+	@Getter
+	@Builder
+	public static class RoomDeleteResponse {
+		private Long id;
+		private String message;
+
+		public static RoomDeleteResponse fromEntity(Room room) {
+			return RoomDeleteResponse.builder()
+				.id(room.getId())
+				.message("Room with id " + room.getId() + " has been deleted successfully.")
+				.build();
+		}
 	}
 }
