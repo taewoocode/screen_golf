@@ -94,13 +94,13 @@ public class Payment {
 	 */
 
 	/**
-	 * // 결제 응답 DTO: 결제 처리 후 클라이언트가 요청하는 정보
+	 * // 결제 응답 DTO: 결제 처리 후 클라이언트가 요청하는 정가
 	 */
 	@Getter
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class PaymentRequestDto {
+	public static class PaymentRequest {
 		private Long reservationId;
 		private Long userId;
 		private Integer amount;
@@ -114,7 +114,7 @@ public class Payment {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class PaymentResponseDto {
+	public static class PaymentResponse {
 		private Long paymentId;       // 생성된 Payment 엔티티의 식별자
 		private Long reservationId;
 		private Long userId;
