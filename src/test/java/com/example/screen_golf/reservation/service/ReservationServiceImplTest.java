@@ -179,4 +179,29 @@ class ReservationServiceImplTest {
 
 		assertEquals(expectedPrice, calculatedPrice);
 	}
+
+	@Test
+	void 유저가_유저쿠폰을_보유한다() throws Exception {
+		User user = new User("test", "password", "testUser", "010-1234-5678",
+			UserRole.USER, UserStatus.ACTIVE, "test");
+
+		ReflectionTestUtils.setField(user, "userCoupons", new ArrayList<UserCoupon>());
+
+		Constructor<UserCoupon> couponConstructor = UserCoupon.class.getDeclaredConstructor();
+		couponConstructor.setAccessible(true);
+		UserCoupon coupon = couponConstructor.newInstance();
+
+		ReflectionTestUtils.setField(coupon, "discountAmount", 10);
+
+		((ArrayList<UserCoupon>)ReflectionTestUtils.getField(user, "userCoupons")).add(coupon);
+
+		// 검증: coupon 리스트가 비어있지 않고, 정확히 하나의 쿠폰이 존재해야 하며,
+		// 쿠폰의 discountAmount 값은 10이어야 함.
+		ArrayList<UserCoupon> coupons = (ArrayList<UserCoupon>)ReflectionTestUtils.getField(user, "userCoupons");
+		assertFalse(coupons.isEmpty(), "User coupon 리스트는 비어있으면 안 됩니다.");
+		assertEquals(1, coupons.size(), "User coupon 리스트는 정확히 하나의 쿠폰을 포함해야 합니다.");
+
+		int discountAmount = (int)ReflectionTestUtils.getField(coupon, "discountAmount");
+		assertEquals(10, discountAmount, "쿠폰의 discountAmount는 10이어야 합니다.");
+	}
 }
