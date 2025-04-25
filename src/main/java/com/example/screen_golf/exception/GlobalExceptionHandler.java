@@ -2,8 +2,10 @@ package com.example.screen_golf.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
 import com.example.screen_golf.exception.reservation.ReservationValidationException;
@@ -71,4 +73,22 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 
+	/**
+	 * @Valid 실패 시 (400 Bad Request)
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException e) {
+		String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+		log.warn("유효성 검사 실패: {}", errorMessage);
+		return ResponseEntity.badRequest().body(errorMessage);
+	}
+
+	/**
+	 * 형 변환 실패 (400 Bad Request)
+	 */
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<String> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+		log.warn("형 변환 실패: {}", e.getMessage());
+		return ResponseEntity.badRequest().body("잘못된 요청 파라미터 형식입니다.");
+	}
 }
