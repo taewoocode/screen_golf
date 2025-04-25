@@ -12,6 +12,7 @@ import com.example.screen_golf.swagger.SwaggerDocs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/user-coupons")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Coupon", description = "Coupon 관련 API")
 public class UserCouponController {
 
 	private final UserCouponService userCouponService;
