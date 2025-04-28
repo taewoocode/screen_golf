@@ -10,8 +10,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
 import com.example.screen_golf.exception.reservation.ReservationValidationException;
 import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
+import com.example.screen_golf.exception.room.RoomCreateException;
 import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomStateException;
+import com.example.screen_golf.exception.room.RoomTimeException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,6 +86,17 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
+	 * Room 생성 시간 예외처리
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(RoomTimeException.class)
+	public ResponseEntity<String> handleRoomTimeException(RoomTimeException e) {
+		log.error("Room 시간 검증 실패: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	}
+
+	/**
 	 * 형 변환 실패 (400 Bad Request)
 	 */
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -91,4 +104,16 @@ public class GlobalExceptionHandler {
 		log.warn("형 변환 실패: {}", e.getMessage());
 		return ResponseEntity.badRequest().body("잘못된 요청 파라미터 형식입니다.");
 	}
+
+	/**
+	 * Room 생성 실패 핸들러
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(RoomCreateException.class)
+	public ResponseEntity<String> handleRoomCreateException(RoomCreateException e) {
+		log.error("Room 생성 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+	}
+
 }
