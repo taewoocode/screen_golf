@@ -12,6 +12,7 @@ import com.example.screen_golf.exception.reservation.ReservationValidationExcept
 import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
 import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomStateException;
+import com.example.screen_golf.exception.room.RoomTimeException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,6 +82,17 @@ public class GlobalExceptionHandler {
 		String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
 		log.warn("유효성 검사 실패: {}", errorMessage);
 		return ResponseEntity.badRequest().body(errorMessage);
+	}
+
+	/**
+	 * Room 생성 시간 예외처리
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(RoomTimeException.class)
+	public ResponseEntity<String> handleRoomTimeException(RoomTimeException e) {
+		log.error("Room 시간 검증 실패: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 
 	/**
