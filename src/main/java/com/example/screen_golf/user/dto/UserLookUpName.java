@@ -10,21 +10,21 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class UserSearch {
+public class UserLookUpName {
 
-	/** ########## 회원조회 DTO ########## **/
+	/** ########## 이름으로 회원조회 DTO ########## **/
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class UserInfoRequest {
-		private Long userId;
+	public static class UserLookUpNameRequest {
+		private String name;
 	}
 
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
-	public static class UserInfoResponse {
+	public static class UserLookUpNameResponse {
 		private Long userId;
 		private String email;
 		private String name;
