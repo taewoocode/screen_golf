@@ -1,6 +1,8 @@
 package com.example.screen_golf.room.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,25 +34,70 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public class Room {
 
+	/**
+	 * Room_id
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/**
+	 * Room_name
+	 */
 	@Column(nullable = false)
 	private String name;
 
+	/**
+	 * Room 상태
+	 */
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private RoomStatus status;
 
+	/**
+	 * Room_타입 - Standard, Premium, VIP
+	 */
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private RoomType roomType;
 
+	/**
+	 * 시간당 가격
+	 */
 	@Column(nullable = false)
 	private Integer pricePerHour;
 
+	/**
+	 * 설명
+	 */
 	private String description;
+
+	/**
+	 * 예약 날짜
+	 */
+	// 예약 관련 추가 필드
+	@Column(nullable = false)
+	private LocalDate reservationDate;
+
+	/**
+	 * 예약 시간
+	 */
+	@Column(nullable = false)
+	private LocalTime startTime;
+
+	/**
+	 * 예약 종료시간
+	 */
+	// 예약 종료 시간은 startTime + usageDurationInHours에서 계산
+	@Column(nullable = false)
+	private LocalTime endTime;
+
+	/**
+	 * 사용자
+	 */
+	// 예약 또는 Room 사용 시의 인원 정보
+	@Column(nullable = false)
+	private Integer userCount;
 
 	@OneToMany(mappedBy = "room")
 	private List<Reservation> reservations = new ArrayList<>();
@@ -64,14 +110,19 @@ public class Room {
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
 
+	// 빌더 패턴을 사용할 때, 예약 관련 필드를 포함하도록 생성자 수정
 	@Builder
-	public Room(String name, RoomStatus status, RoomType roomType, Integer pricePerHour, String description) {
-
+	public Room(String name, RoomStatus status, RoomType roomType, Integer pricePerHour, String description,
+		LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Integer userCount) {
 		this.name = name;
 		this.status = status;
 		this.roomType = roomType;
 		this.pricePerHour = pricePerHour;
 		this.description = description;
+		this.reservationDate = reservationDate;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.userCount = userCount;
 	}
 
 	public void updateRoomInfo(String name, Integer pricePerHour, String description) {
@@ -97,99 +148,43 @@ public class Room {
 	}
 
 	/**
-	 * Room 수정 요청 DTO
-	 * 업데이트 시 계층 간 전송할 데이터를 정의하며, 엔티티의 특정 필드를 변경할 때 사용됩니다.
+	 * =====================================================================
+	 * 							Setter 지양
+	 * =====================================================================
 	 */
-	@Getter
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class RoomUpdateRequest {
-		private Long id;
-		private RoomStatus roomStatus;
-		private String name;
-		private Integer pricePerHour;
-		private String description;
+	public void updateRoomName(String name) {
+		this.name = name;
+	}
 
-		/**
-		 * 해당 DTO의 값을 Room 엔티티에 반영하는 헬퍼 메서드
-		 */
-		public void apply(Room room) {
-			room.updateRoomInfo(this.name, this.pricePerHour, this.description);
-			room.updateStatus(this.roomStatus);
+	public void updateReservationDate(LocalDate reservationDate) {
+		this.reservationDate = reservationDate;
+	}
 
-		}
+	public void updateStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public void updateEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public void updateRoomType(RoomType roomType) {
+		this.roomType = roomType;
+	}
+
+	public void updateRoomPrice(Integer pricePerHour) {
+		this.pricePerHour = pricePerHour;
+	}
+
+	public void updateUserCount(Integer userCount) {
+		this.userCount = userCount;
+	}
+
+	public void updateRoomDescription(String description) {
+		this.description = description;
 	}
 
 	private void updateStatus(RoomStatus roomStatus) {
 		this.status = roomStatus;
 	}
-
-	/**
-	 * Room 수정 응답 DTO
-	 * Room 수정 후의 결과 정보를 담습니다.
-	 */
-	@Getter
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class RoomUpdateResponse {
-		private Long id;
-		private RoomStatus roomStatus;
-		private String name;
-		private Integer pricePerHour;
-		private String description;
-	}
-
-	/**
-	 * Room 타입으로 조회 요청 DTO
-	 * 클라이언트가 특정 Room 타입을 기반으로 조회할 때 사용
-	 */
-	@Getter
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class RoomTypeRequest {
-		private RoomType roomType;
-	}
-
-	/**
-	 * Room 삭제 응답
-	 * 삭제 작업 후 클라이언트에 제공할 정보
-	 */
-	@Getter
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class RoomDeleteResponse {
-		private Long id;
-		private String message;
-
-		public static RoomDeleteResponse fromEntity(Room room) {
-			return RoomDeleteResponse.builder()
-				.id(room.getId())
-				.message(room.getId() + ": 룸 변경 완료")
-				.build();
-		}
-	}
-
-	/**
-	 * Room 삭제 요청
-	 */
-	@Getter
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public static class RoomDeleteRequest {
-		private Long id;
-		private String message;
-
-		public static RoomDeleteResponse fromEntity(Room room) {
-			return RoomDeleteResponse.builder()
-				.id(room.getId())
-				.message(room.getId() + ": 룸 삭제 완료")
-				.build();
-		}
-	}
-
 }
