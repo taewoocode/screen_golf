@@ -38,7 +38,7 @@ public class RoomCreateInfo {
 
 	@Getter
 	@Builder
-	public static class RoomResponse {
+	public static class RoomCreateResponse {
 		private Long id;
 		private String name;
 		private RoomStatus status;
@@ -48,8 +48,8 @@ public class RoomCreateInfo {
 		private LocalDateTime createdAt;
 		private LocalDateTime updatedAt;
 
-		public static RoomResponse fromEntity(Room room) {
-			return RoomResponse.builder()
+		public static RoomCreateResponse fromEntity(Room room) {
+			return RoomCreateResponse.builder()
 				.id(room.getId())
 				.name(room.getName())
 				.status(room.getStatus())
