@@ -96,67 +96,6 @@ public class Room {
 		};
 	}
 
-
-	/* ======================================================================
-	 *                         	Room DTO 관련
-	 * ======================================================================
-	 */
-
-	/**
-	 * Room 생성 요청 DTO
-	 * 클라이언트로부터 생성할 데이터만 받아 엔티티로 변환하는 역할을 합니다.
-	 */
-	@Getter
-	@Builder
-	public static class RoomCreateRequest {
-		private Long id;
-		private String name;
-		private RoomType roomType;
-		private Integer pricePerHour;
-		private String description;
-
-		// DTO -> Entity 변환 메서드, 기본 상태는 AVAILABLE로 설정
-		public Room toEntity(RoomStatus status) {
-			return Room.builder()
-				.name(this.name)
-				.status(status)
-				.roomType(this.roomType)
-				.pricePerHour(this.pricePerHour)
-				.description(this.description)
-				.build();
-		}
-	}
-
-	/**
-	 * Room 조회 응답 DTO
-	 * Room 엔티티의 정보를 클라이언트에 제공하기 위한 데이터 포맷입니다.
-	 */
-	@Getter
-	@Builder
-	public static class RoomResponse {
-		private Long id;
-		private String name;
-		private RoomStatus status;
-		private RoomType roomType;
-		private Integer pricePerHour;
-		private String description;
-		private LocalDateTime createdAt;
-		private LocalDateTime updatedAt;
-
-		public static RoomResponse fromEntity(Room room) {
-			return RoomResponse.builder()
-				.id(room.getId())
-				.name(room.getName())
-				.status(room.getStatus())
-				.roomType(room.getRoomType())
-				.pricePerHour(room.getPricePerHour())
-				.description(room.getDescription())
-				.createdAt(room.getCreatedAt())
-				.updatedAt(room.getUpdatedAt())
-				.build();
-		}
-	}
-
 	/**
 	 * Room 수정 요청 DTO
 	 * 업데이트 시 계층 간 전송할 데이터를 정의하며, 엔티티의 특정 필드를 변경할 때 사용됩니다.
