@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.room.domain.Room;
+import com.example.screen_golf.room.dto.AvailableRoomInfo;
 import com.example.screen_golf.room.dto.FindRoomType;
 import com.example.screen_golf.room.dto.RoomCreateInfo;
 import com.example.screen_golf.room.dto.RoomDeleteInfo;
@@ -61,4 +62,10 @@ public interface RoomService {
 	 * @return 삭제 완료 후의 결과 메시지를 담은 RoomDeleteResponse DTO
 	 */
 	RoomDeleteInfo.RoomDeleteResponse deleteRoom(RoomDeleteInfo.RoomDeleteRequest request);
+
+	/**
+	 * 이용 가능한 Room 조회
+	 */
+	AvailableRoomInfo.AvailableRoomResponse availableRoom(
+		AvailableRoomInfo.AvailableRoomRequest availableRoomRequest);
 }
