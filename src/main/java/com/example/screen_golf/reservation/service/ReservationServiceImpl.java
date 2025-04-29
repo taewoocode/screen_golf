@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
@@ -39,6 +40,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private final DiscountPolicy discountPolicy;
 
 	@Override
+	@Transactional
 	public ReservationCreateInfo.ReservationCreateResponse createReservation(
 		ReservationCreateInfo.ReservationCreateRequest request) {
 		// 운영 시간 검증 11시 ~ 22시
