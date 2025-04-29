@@ -14,6 +14,7 @@ import com.example.screen_golf.exception.room.RoomCreateException;
 import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomStateException;
 import com.example.screen_golf.exception.room.RoomTimeException;
+import com.example.screen_golf.exception.room.RoomUpdateException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -116,4 +117,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 	}
 
+	/**
+	 * Room Update 오류 핸들러
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(RoomUpdateException.class)
+	public ResponseEntity<String> handleRoomUpdateException(RoomUpdateException e) {
+		log.error("Room 업데이트 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+	}
 }
