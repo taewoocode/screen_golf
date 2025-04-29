@@ -71,7 +71,7 @@ public class SwaggerDocs {
 
 	public static final String SUMMARY_DELETE_USER_COUPON = "사용자 쿠폰 삭제";
 	public static final String DESCRIPTION_DELETE_USER_COUPON =
-		"사용자 ID를 입력받아 사용자에게 쿠폰을 삭제합니다.";
+		"CouponId를 입력받아 쿠폰을 삭제합니다.";
 
 	/**===================================================================
 	 *                   Payment 관련 Swagger Docs
