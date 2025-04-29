@@ -66,6 +66,6 @@ public interface RoomService {
 	/**
 	 * 이용 가능한 Room 조회
 	 */
-	AvailableRoomInfo.AvailableRoomResponse availableRoom(
+	List<AvailableRoomInfo.AvailableRoomResponse> availableRoom(
 		AvailableRoomInfo.AvailableRoomRequest availableRoomRequest);
 }
