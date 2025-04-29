@@ -77,6 +77,10 @@ public class SwaggerDocs {
 	public static final String DESCRIPTION_USER_COUPON_INFO =
 		"CouponId를 입력받아 쿠폰을 조회합니다.";
 
+	public static final String SUMMARY_USER_COUPON_INFO_FROM_USER_ID = "쿠폰 정보";
+	public static final String DESCRIPTION_USER_COUPON_INFO_FROM_USER_ID =
+		"UserId를 입력받아 쿠폰을 조회합니다.";
+
 	/**===================================================================
 	 *                   Payment 관련 Swagger Docs
 	 * ===================================================================
