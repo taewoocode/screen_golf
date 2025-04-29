@@ -2,6 +2,7 @@ package com.example.screen_golf.coupon.service;
 
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
 
 public interface UserCouponService {
 
@@ -19,5 +20,11 @@ public interface UserCouponService {
 	 * @return
 	 */
 	UserCouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(
+		Long userCouponId);
+
+	/**
+	 * UserCouponId로 쿠폰의 정보를 조회
+	 */
+	UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse findCoupon(
 		Long userCouponId);
 }
