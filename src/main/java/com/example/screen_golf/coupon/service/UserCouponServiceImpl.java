@@ -1,25 +1,25 @@
 package com.example.screen_golf.coupon.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
 import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.exception.coupon.CouponNotFoundException;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Coupon", description = "쿠폰 관련 API")
-@RequestMapping("api/coupon")
 public class UserCouponServiceImpl implements UserCouponService {
 
 	private final UserCouponRepository userCouponRepository;
@@ -55,6 +55,36 @@ public class UserCouponServiceImpl implements UserCouponService {
 			.userCouponId(userCouponId)
 			.success(true)
 			.build();
+	}
+
+	/**
+	 * 단일 쿠폰 조회 -> 쿠폰ID를 입력받아 해당쿠폰 정보를 확인한다.
+	 * @param userCouponId
+	 * @return
+	 */
+	@Override
+	public UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse findCoupon(Long userCouponId) {
+		Optional<UserCoupon> findByCouponId = userCouponRepository.findById(userCouponId);
+
+		if (findByCouponId.isEmpty()) {
+			throw new CouponNotFoundException("쿠폰을 찾을 수 없습니다.");
+		}
+
+		UserCoupon userCoupon = findByCouponId.get();
+
+		return UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse.builder()
+			.id(userCoupon.getId())
+			.user(userCoupon.getUser())
+			.couponCode(userCoupon.getCouponCode())
+			.name(userCoupon.getName())
+			.discountAmount(userCoupon.getDiscountAmount())
+			.validFrom(userCoupon.getValidFrom())
+			.validTo(userCoupon.getValidTo())
+			.status(userCoupon.getStatus())
+			.createdAt(userCoupon.getCreatedAt())
+			.updatedAt(userCoupon.getUpdatedAt())
+			.build();
+
 	}
 
 	private static UserCouponCreateInfo.UserCouponCreateResponse getUserCouponCreateResponse(UserCoupon savedCoupon,
