@@ -9,8 +9,10 @@ import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
 import com.example.screen_golf.coupon.repository.UserCouponRepository;
 import com.example.screen_golf.exception.coupon.CouponNotFoundException;
+import com.example.screen_golf.exception.user.UserNotFoundException;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
 
@@ -85,6 +87,27 @@ public class UserCouponServiceImpl implements UserCouponService {
 			.updatedAt(userCoupon.getUpdatedAt())
 			.build();
 
+	}
+
+	@Override
+	public UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse findCouponInfoByUserId(Long userId) {
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
+		UserCoupon coupon = userCouponRepository.findByUser(user)
+			.orElseThrow(() -> new CouponNotFoundException("해당 쿠폰을 찾을 수 없습니다."));
+		return UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse.builder()
+			.userId(user.getId())
+			.id(coupon.getId())
+			.couponCode(coupon.getCouponCode())
+			.name(coupon.getName())
+			.discountAmount(coupon.getDiscountAmount())
+			.validFrom(coupon.getValidFrom())
+			.validTo(coupon.getValidTo())
+			.status(coupon.getStatus())
+			.createdAt(coupon.getCreatedAt())
+			.updatedAt(coupon.getUpdatedAt())
+			.build();
 	}
 
 	private static UserCouponCreateInfo.UserCouponCreateResponse getUserCouponCreateResponse(UserCoupon savedCoupon,

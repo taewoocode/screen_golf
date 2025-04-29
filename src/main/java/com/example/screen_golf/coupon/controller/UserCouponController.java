@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
 import com.example.screen_golf.coupon.service.UserCouponService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
@@ -72,5 +73,24 @@ public class UserCouponController {
 		UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse response =
 			userCouponService.findCoupon(userCouponId);
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * UserId를 받아서 조회
+	 * @param userId
+	 * @return
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_USER_COUPON_INFO_FROM_USER_ID,
+		description = SwaggerDocs.DESCRIPTION_USER_COUPON_INFO_FROM_USER_ID
+	)
+	@GetMapping("/users/{userId}")
+	public ResponseEntity<UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse> findByCouponInfoByUserId(
+		@Parameter(description = "조회할 유저 Id", required = true)
+		@PathVariable("userId") Long userId
+	) {
+		UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse couponInfoByUserId =
+			userCouponService.findCouponInfoByUserId(userId);
+		return ResponseEntity.ok(couponInfoByUserId);
 	}
 }

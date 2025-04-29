@@ -3,6 +3,7 @@ package com.example.screen_golf.coupon.service;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
 
 public interface UserCouponService {
 
@@ -27,4 +28,7 @@ public interface UserCouponService {
 	 */
 	UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse findCoupon(
 		Long userCouponId);
+
+	UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse findCouponInfoByUserId(
+		Long userId);
 }
