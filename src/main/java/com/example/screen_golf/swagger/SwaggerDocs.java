@@ -61,6 +61,10 @@ public class SwaggerDocs {
 	public static final String SUMMARY_ROOM_DELETE = "Room 삭제";
 	public static final String DESCRIPTION_ROOM_DELETE = "Room을 삭제합니다.";
 
+	// Room 삭제
+	public static final String SUMMARY_ROOM_AVAILABLE_LIST = "이용가능한 Room 리스트 조회";
+	public static final String DESCRIPTION_ROOM_AVAILABLE_LIST = "이용가능한 Room 리스트를 조회합니다.";
+
 	/**===================================================================
 	 *                   UserCoupon 관련 Swagger Docs
 	 * ===================================================================

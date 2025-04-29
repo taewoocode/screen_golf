@@ -1,6 +1,8 @@
 package com.example.screen_golf.room.respository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,5 +56,17 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 	boolean existsByName(String name);
 
 	Optional<Room> findByName(String name);
+
+	@Query("SELECT r FROM Room r WHERE r.status = 'AVAILABLE' AND r.roomType = :roomType " +
+		"AND r.reservationDate = :reservationDate " +
+		"AND r.userCount >= :userCount " +
+		"AND NOT EXISTS (SELECT 1 FROM Reservation res WHERE res.room = r AND " +
+		"(res.startTime < :endTime AND res.endTime > :startTime))")
+	List<Room> findAvailableRooms(
+		LocalDate reservationDate,
+		LocalTime startTime,
+		int durationInHours,
+		int userCount,
+		RoomType roomType);
 
 }

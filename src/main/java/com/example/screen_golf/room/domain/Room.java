@@ -130,6 +130,11 @@ public class Room {
 		this.description = description;
 	}
 
+	// 상태 반환 메서드 추가
+	public RoomStatus getRoomStatus() {
+		return this.status;
+	}
+
 	public void updateRoomName(String name) {
 		this.name = name;
 	}
