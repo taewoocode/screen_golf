@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.example.screen_golf.exception.coupon.CouponNotFoundException;
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
 import com.example.screen_golf.exception.reservation.ReservationValidationException;
 import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
@@ -126,5 +127,17 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<String> handleRoomUpdateException(RoomUpdateException e) {
 		log.error("Room 업데이트 오류: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+	}
+
+	/**=========================================================================
+	 *                           UserCoupon 관련
+	 * =========================================================================
+	 */
+
+	@ExceptionHandler(CouponNotFoundException.class)
+	public ResponseEntity<String> handleCouponNotFoundException(CouponNotFoundException e) {
+		log.error("Coupon 찾기 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
 	}
 }
