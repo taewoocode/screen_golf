@@ -35,7 +35,7 @@ public class ReservationSearchIdInfo {
 		private String startTime;
 		private String endTime;
 
-		public static ReservationSearchIdResponse fromReservation(Reservation reservation) {
+		public static ReservationSearchIdResponse convertReservationDto(Reservation reservation) {
 			return ReservationSearchIdResponse.builder()
 				.reservationId(reservation.getId())
 				.roomName(reservation.getRoom().getName())
