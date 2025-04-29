@@ -2,7 +2,9 @@ package com.example.screen_golf.reservation.service;
 
 import java.util.List;
 
-import com.example.screen_golf.reservation.domain.Reservation;
+import com.example.screen_golf.reservation.dto.ReservationAvailableInfo;
+import com.example.screen_golf.reservation.dto.ReservationCreateInfo;
+import com.example.screen_golf.reservation.dto.ReservationSearchIdInfo;
 
 public interface ReservationService {
 
@@ -13,7 +15,8 @@ public interface ReservationService {
 	 * @param request 예약 진행 요청 DTO
 	 * @return 생성된 예약의 결과 응답 DTO
 	 */
-	Reservation.ReservationResponse createReservation(Reservation.ReservationBookingRequest request);
+	ReservationCreateInfo.ReservationCreateResponse createReservation(
+		ReservationCreateInfo.ReservationCreateRequest request);
 
 	/**
 	 * 예약 가능한 방 검색 요청 처리.
@@ -23,13 +26,14 @@ public interface ReservationService {
 	 * @param request 예약 검색 요청 DTO
 	 * @return 검색 결과로 얻은 예약 가능한 방 리스트
 	 */
-	List<Reservation.AvailableRoomResponse> searchAvailableRooms(Reservation.ReservationSearchRequest request);
+	List<ReservationAvailableInfo.ReservationAvaliableSearchResponse> searchAvailableRooms(
+		ReservationAvailableInfo.ReservationAvailableSearchRequest request);
 
 	/**
-	 * 사용자 별 예약 내역 조회.
-	 *
-	 * @param userId 사용자 ID
-	 * @return 해당 사용자의 예약 내역 목록
+	 * ID로 사용자를 조회하는 DTO
+	 * @param request
+	 * @return
 	 */
-	List<Reservation.ReservationResponse> getUserReservations(Long userId);
+	List<ReservationSearchIdInfo.ReservationSearchIdResponse> getUserReservations(
+		ReservationSearchIdInfo.ReservationSearchIdRequest request);
 }

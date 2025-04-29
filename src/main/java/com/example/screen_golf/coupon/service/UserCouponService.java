@@ -1,8 +1,23 @@
 package com.example.screen_golf.coupon.service;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
+import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
+import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
 
 public interface UserCouponService {
 
-	UserCoupon.UserCouponCreateResponse createCoupon(UserCoupon.UserCouponCreateRequest request);
+	/**
+	 * 쿠폰생성
+	 * @param request
+	 * @return
+	 */
+	UserCouponCreateInfo.UserCouponCreateResponse createCoupon(
+		UserCouponCreateInfo.UserCouponCreateRequest request);
+
+	/**
+	 * 쿠폰삭제
+	 * @param userCouponId
+	 * @return
+	 */
+	UserCouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(
+		Long userCouponId);
 }
