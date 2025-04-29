@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.room.domain.Room;
+import com.example.screen_golf.room.dto.AvailableRoomInfo;
 import com.example.screen_golf.room.dto.FindRoomType;
 import com.example.screen_golf.room.dto.RoomCreateInfo;
 import com.example.screen_golf.room.dto.RoomDeleteInfo;
@@ -148,4 +149,20 @@ public class RoomController {
 			return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
 		}
 	}
+
+	@PostMapping("/available")
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_ROOM_AVAILABLE_LIST,
+		description = SwaggerDocs.DESCRIPTION_ROOM_AVAILABLE_LIST
+	)
+	public ResponseEntity<List<AvailableRoomInfo.AvailableRoomResponse>> findAvailableRooms(
+		@Parameter(description = "이용가능한 Room", required = true)
+		@RequestBody AvailableRoomInfo.AvailableRoomRequest availableRoomRequest
+	) {
+		List<AvailableRoomInfo.AvailableRoomResponse> availableRoomResponses
+			= roomService.availableRoom(availableRoomRequest);
+		log.info("이용가능한 Room조회 성공={}", availableRoomRequest);
+		return ResponseEntity.ok(availableRoomResponses);
+	}
+
 }
