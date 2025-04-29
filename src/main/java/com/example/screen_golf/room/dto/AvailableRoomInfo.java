@@ -22,6 +22,7 @@ public class AvailableRoomInfo {
 		private LocalTime startTime;
 		private int durationInHours;
 		private Integer userCount;
+		private RoomType roomType;
 	}
 
 	@AllArgsConstructor
