@@ -110,7 +110,6 @@ public class Room {
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
 
-	// 빌더 패턴을 사용할 때, 예약 관련 필드를 포함하도록 생성자 수정
 	@Builder
 	public Room(String name, RoomStatus status, RoomType roomType, Integer pricePerHour, String description,
 		LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Integer userCount) {
@@ -131,27 +130,6 @@ public class Room {
 		this.description = description;
 	}
 
-	public void changeStatus(RoomStatus status) {
-		this.status = status;
-	}
-
-	public boolean canChangeStatusTo(RoomStatus newStatus) {
-		if (this.status == newStatus)
-			return true; // 같은 상태면 허용
-
-		return switch (this.status) {
-			case AVAILABLE -> newStatus == RoomStatus.RESERVED || newStatus == RoomStatus.MAINTENANCE;
-			case RESERVED -> newStatus == RoomStatus.IN_USE || newStatus == RoomStatus.AVAILABLE;
-			case IN_USE -> newStatus == RoomStatus.AVAILABLE || newStatus == RoomStatus.MAINTENANCE;
-			case MAINTENANCE -> newStatus == RoomStatus.AVAILABLE;
-		};
-	}
-
-	/**
-	 * =====================================================================
-	 * 							Setter 지양
-	 * =====================================================================
-	 */
 	public void updateRoomName(String name) {
 		this.name = name;
 	}
@@ -184,7 +162,28 @@ public class Room {
 		this.description = description;
 	}
 
+	public void updateRoomTime(LocalTime startTime, int durationInHours) {
+		this.startTime = startTime;
+		this.endTime = startTime.plusHours(durationInHours);
+	}
+
 	private void updateStatus(RoomStatus roomStatus) {
 		this.status = roomStatus;
+	}
+
+	public void changeStatus(RoomStatus status) {
+		this.status = status;
+	}
+
+	public boolean canChangeStatusTo(RoomStatus newStatus) {
+		if (this.status == newStatus)
+			return true;
+
+		return switch (this.status) {
+			case AVAILABLE -> newStatus == RoomStatus.RESERVED || newStatus == RoomStatus.MAINTENANCE;
+			case RESERVED -> newStatus == RoomStatus.IN_USE || newStatus == RoomStatus.AVAILABLE;
+			case IN_USE -> newStatus == RoomStatus.AVAILABLE || newStatus == RoomStatus.MAINTENANCE;
+			case MAINTENANCE -> newStatus == RoomStatus.AVAILABLE;
+		};
 	}
 }
