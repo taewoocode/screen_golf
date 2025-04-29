@@ -1,6 +1,8 @@
 package com.example.screen_golf.user.service;
 
-import com.example.screen_golf.user.domain.User;
+import com.example.screen_golf.user.dto.UserLookUpId;
+import com.example.screen_golf.user.dto.UserLookUpName;
+import com.example.screen_golf.user.dto.UserSignUpInfo;
 
 public interface UserService {
 
@@ -9,20 +11,20 @@ public interface UserService {
 	 * @param request
 	 * @return
 	 */
-	User.UserSignUpResponse registerUser(User.UserSignUpRequest request);
+	UserSignUpInfo.UserSignUpResponse registerUser(UserSignUpInfo.UserSignUpRequest request);
 
 	/**
 	 * 유저 정보 가져오기
 	 * @param request
 	 * @return
 	 */
-	User.UserInfoResponse findUser(User.UserInfoRequest request);
+	UserLookUpId.UserLookUpIdResponse findUser(UserLookUpId.UserLookUpIdRequest request);
 
 	/**
 	 * 이름으로 회원정보 조회하기
 	 * @param request
 	 * @return
 	 */
-	User.UserInfoNameResponse findUser(User.UserInfoNameRequest request);
+	UserLookUpName.UserLookUpNameResponse findUser(UserLookUpName.UserLookUpNameRequest request);
 
 }

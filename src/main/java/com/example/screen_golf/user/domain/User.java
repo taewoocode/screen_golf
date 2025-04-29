@@ -22,7 +22,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -93,75 +92,5 @@ public class User {
 
 	public void changePassword(String newPassword) {
 		this.password = newPassword;
-	}
-
-	/** ########## 회원가입 DTO ########## **/
-	@Getter
-	@NoArgsConstructor
-	public static class UserSignUpRequest {
-		private String email;
-		private String password;
-		private String name;
-		private String phone;
-		private String profileImage;
-	}
-
-	@Getter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class UserSignUpResponse {
-		private Long userId;
-		private String email;
-		private String name;
-		private UserRole role;
-	}
-
-	/** ########## 회원조회 DTO ########## **/
-	@Getter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class UserInfoRequest {
-		private Long userId;
-	}
-
-	@Getter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class UserInfoResponse {
-		private Long userId;
-		private String email;
-		private String name;
-		private String phone;
-		private String profileImage;
-		private UserRole role;
-		private UserStatus status;
-		private LocalDateTime createdAt;
-		private LocalDateTime updatedAt;
-	}
-
-	/** ########## 이름으로 회원조회 DTO ########## **/
-	@Getter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class UserInfoNameRequest {
-		private String name;
-	}
-
-	@Getter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class UserInfoNameResponse {
-		private Long userId;
-		private String email;
-		private String name;
-		private String phone;
-		private String profileImage;
-		private UserRole role;
-		private UserStatus status;
-		private LocalDateTime createdAt;
-		private LocalDateTime updatedAt;
 	}
 }
