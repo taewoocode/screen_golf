@@ -1,6 +1,6 @@
 package com.example.screen_golf.room.dto;
 
-리import java.time.LocalDate;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
