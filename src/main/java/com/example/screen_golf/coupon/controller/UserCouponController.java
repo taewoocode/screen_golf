@@ -2,6 +2,7 @@ package com.example.screen_golf.coupon.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
 import com.example.screen_golf.coupon.service.UserCouponService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
@@ -56,5 +58,19 @@ public class UserCouponController {
 			= userCouponService.deleteCoupon(userCouponId);
 		log.info("쿠폰 삭제 성공 - 쿠폰 이름 = {}", userCouponDeleteResponse.getUserCouponId());
 		return ResponseEntity.ok(userCouponDeleteResponse);
+	}
+
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_USER_COUPON_INFO,
+		description = SwaggerDocs.DESCRIPTION_USER_COUPON_INFO
+	)
+	@GetMapping("/{userCouponId}")
+	public ResponseEntity<UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse> findByCoupon(
+		@Parameter(description = "조회할 쿠폰 Id", required = true)
+		@PathVariable("userCouponId") Long userCouponId
+	) {
+		UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse response =
+			userCouponService.findCoupon(userCouponId);
+		return ResponseEntity.ok(response);
 	}
 }
