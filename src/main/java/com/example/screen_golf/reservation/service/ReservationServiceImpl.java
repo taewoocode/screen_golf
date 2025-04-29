@@ -15,6 +15,9 @@ import com.example.screen_golf.exception.reservation.ReservationConflictExceptio
 import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
 import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
+import com.example.screen_golf.reservation.dto.ReservationAvailableInfo;
+import com.example.screen_golf.reservation.dto.ReservationCreateInfo;
+import com.example.screen_golf.reservation.dto.ReservationSearchIdInfo;
 import com.example.screen_golf.reservation.repository.ReservationRepository;
 import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.RoomType;
@@ -36,7 +39,8 @@ public class ReservationServiceImpl implements ReservationService {
 	private final DiscountPolicy discountPolicy;
 
 	@Override
-	public Reservation.ReservationResponse createReservation(Reservation.ReservationBookingRequest request) {
+	public ReservationCreateInfo.ReservationCreateResponse createReservation(
+		ReservationCreateInfo.ReservationCreateRequest request) {
 		// 운영 시간 검증 11시 ~ 22시
 		request.validateOperatingHours();
 
@@ -65,7 +69,8 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public List<Reservation.AvailableRoomResponse> searchAvailableRooms(Reservation.ReservationSearchRequest request) {
+	public List<ReservationAvailableInfo.ReservationAvaliableSearchResponse> searchAvailableRooms(
+		ReservationAvailableInfo.ReservationAvailableSearchRequest request) {
 		//예약 조회
 		request.validateOperatingHours();
 		LocalDateTime reservationStartDateTime = request.getReservationStartDateTime();
@@ -77,18 +82,20 @@ public class ReservationServiceImpl implements ReservationService {
 				reservationStartDateTime, reservationEndDateTime, roomType);
 
 		return reservationRoomType.stream()
-			.map(r -> Reservation.AvailableRoomResponse.fromRoom(r.getRoom()))
+			.map(r -> ReservationAvailableInfo.ReservationAvaliableSearchResponse.fromRoom(r.getRoom()))
 			.collect(Collectors.collectingAndThen(
-				Collectors.toMap(Reservation.AvailableRoomResponse::getRoomId, Function.identity(), (a, b) -> a),
+				Collectors.toMap(ReservationAvailableInfo.ReservationAvaliableSearchResponse::getRoomId,
+					Function.identity(), (a, b) -> a),
 				map -> new ArrayList<>(map.values())
 			));
 	}
 
 	@Override
-	public List<Reservation.ReservationResponse> getUserReservations(Long userId) {
-		List<Reservation> reservations = reservationRepository.findByUserId(userId);
+	public List<ReservationSearchIdInfo.ReservationSearchIdResponse> getUserReservations(
+		ReservationSearchIdInfo.ReservationSearchIdRequest request) {
+		List<Reservation> reservations = reservationRepository.findByUserId(request.getUserId());
 		return reservations.stream()
-			.map(Reservation.ReservationResponse::fromEntity)
+			.map(ReservationSearchIdInfo.ReservationSearchIdResponse::convertReservationDto)
 			.collect(Collectors.toList());
 	}
 
@@ -98,13 +105,14 @@ public class ReservationServiceImpl implements ReservationService {
 		}
 	}
 
-	private User validateUser(Reservation.ReservationBookingRequest request) {
+	private User validateUser(ReservationCreateInfo.ReservationCreateRequest request) {
 		User user = userRepository.findById(request.getUserId())
 			.orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다."));
 		return user;
 	}
 
-	private Reservation.ReservationResponse makeReservation(Reservation.ReservationBookingRequest request,
+	private ReservationCreateInfo.ReservationCreateResponse makeReservation(
+		ReservationCreateInfo.ReservationCreateRequest request,
 		User user, Room selectedRoom, LocalDateTime reservationStart, LocalDateTime reservationEnd) {
 		Reservation reservation = Reservation.builder()
 			.user(user)
@@ -115,7 +123,7 @@ public class ReservationServiceImpl implements ReservationService {
 			.build();
 
 		Reservation savedReservation = reservationRepository.save(reservation);
-		return Reservation.ReservationResponse.fromEntity(savedReservation);
+		return ReservationCreateInfo.ReservationCreateResponse.fromEntity(savedReservation);
 	}
 
 	private void applyCoupon(User user, LocalDateTime reservationStart, LocalDateTime reservationEnd) {
