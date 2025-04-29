@@ -74,7 +74,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 		return UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse.builder()
 			.id(userCoupon.getId())
-			.user(userCoupon.getUser())
+			.userId(userCoupon.getUser().getId())
 			.couponCode(userCoupon.getCouponCode())
 			.name(userCoupon.getName())
 			.discountAmount(userCoupon.getDiscountAmount())
