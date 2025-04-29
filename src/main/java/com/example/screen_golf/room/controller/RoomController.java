@@ -150,7 +150,7 @@ public class RoomController {
 		}
 	}
 
-	@PostMapping("/available")
+	@PostMapping("available")
 	@Operation(
 		summary = SwaggerDocs.SUMMARY_ROOM_AVAILABLE_LIST,
 		description = SwaggerDocs.DESCRIPTION_ROOM_AVAILABLE_LIST
