@@ -15,9 +15,9 @@ public interface UserCouponService {
 
 	/**
 	 * 쿠폰삭제
-	 * @param request
+	 * @param userCouponId
 	 * @return
 	 */
 	UserCouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(
-		UserCouponDeleteInfo.UserCouponDeleteRequest request);
+		Long userCouponId);
 }

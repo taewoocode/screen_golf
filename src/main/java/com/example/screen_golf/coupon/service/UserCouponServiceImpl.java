@@ -1,6 +1,8 @@
 package com.example.screen_golf.coupon.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
@@ -9,12 +11,15 @@ import com.example.screen_golf.coupon.repository.UserCouponRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Coupon", description = "쿠폰 관련 API")
+@RequestMapping("api/coupon")
 public class UserCouponServiceImpl implements UserCouponService {
 
 	private final UserCouponRepository userCouponRepository;
@@ -36,14 +41,14 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 	/**
 	 * 쿠폰삭제 사용자의 ID를 Param으로 받아, 쿠폰을 삭제합니다.
-	 * @param request
+	 * @param userCouponId
 	 * @return
 	 */
 	@Override
+	@Transactional
 	public UserCouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(
-		UserCouponDeleteInfo.UserCouponDeleteRequest request) {
+		Long userCouponId) {
 
-		Long userCouponId = request.getUserCouponId();
 		userCouponRepository.deleteById(userCouponId);
 
 		return UserCouponDeleteInfo.UserCouponDeleteResponse.builder()
