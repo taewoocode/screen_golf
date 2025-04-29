@@ -93,5 +93,4 @@ public class UserCoupon {
 			now.isAfter(validFrom) &&
 			now.isBefore(validTo);
 	}
-
 } 
