@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.screen_golf.reservation.domain.Reservation;
+import com.example.screen_golf.reservation.dto.ReservationAvailableInfo;
+import com.example.screen_golf.reservation.dto.ReservationCreateInfo;
+import com.example.screen_golf.reservation.dto.ReservationSearchIdInfo;
 import com.example.screen_golf.reservation.service.ReservationService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
@@ -39,10 +41,10 @@ public class ReservationController {
 		description = SwaggerDocs.DESCRIPTION_RESERVATION_CREATE
 	)
 	@PostMapping
-	public ResponseEntity<Reservation.ReservationResponse> createReservation(
+	public ResponseEntity<ReservationCreateInfo.ReservationCreateResponse> createReservation(
 		@Parameter(description = "예약 진행 요청 DTO", required = true)
-		@RequestBody Reservation.ReservationBookingRequest request) {
-		Reservation.ReservationResponse reservation = reservationService.createReservation(request);
+		@RequestBody ReservationCreateInfo.ReservationCreateRequest request) {
+		ReservationCreateInfo.ReservationCreateResponse reservation = reservationService.createReservation(request);
 		log.info("예약 성공 - 예약 ID ={}", reservation);
 		return ResponseEntity.ok(reservation);
 	}
@@ -56,14 +58,16 @@ public class ReservationController {
 		description = SwaggerDocs.DESCRIPTION_RESERVATION_SEARCH_AVAILABLE
 	)
 	@PostMapping("/available")
-	public ResponseEntity<List<Reservation.AvailableRoomResponse>> searchAvailableRooms(
+	public ResponseEntity<List<ReservationAvailableInfo.ReservationAvaliableSearchResponse>> searchAvailableRooms(
 		@Parameter(description = "예약 가능한 방 검색 요청 DTO", required = true)
-		@RequestBody Reservation.ReservationSearchRequest request) {
-		List<Reservation.AvailableRoomResponse> response = reservationService.searchAvailableRooms(request);
+		@RequestBody ReservationAvailableInfo.ReservationAvailableSearchRequest request) {
+		List<ReservationAvailableInfo.ReservationAvaliableSearchResponse> reservationAvaliableSearchResponses
+			= reservationService.searchAvailableRooms(
+			request);
 		log.info("예약 가능한 방 검색 성공 - 조건: 날짜={}, 시작시간={}, 종료시간={}, 룸 타입={},남은 방 갯수={}",
 			request.getDate(), request.getDesiredStartTime(), request.getDesiredEndTime(), request.getRoomType(),
-			response.size());
-		return ResponseEntity.ok(response);
+			reservationAvaliableSearchResponses.size());
+		return ResponseEntity.ok(reservationAvaliableSearchResponses);
 	}
 
 	/**
@@ -75,11 +79,12 @@ public class ReservationController {
 		description = SwaggerDocs.DESCRIPTION_RESERVATION_GET_USER_RESERVATIONS
 	)
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<Reservation.ReservationResponse>> getUserReservations(
+	public ResponseEntity<List<ReservationSearchIdInfo.ReservationSearchIdResponse>> getUserReservations(
 		@Parameter(description = "조회할 사용자 ID", required = true)
-		@PathVariable("userId") Long userId) {
-		List<Reservation.ReservationResponse> responses = reservationService.getUserReservations(userId);
-		log.info("사용자 예약 내역 조회 성공 - 사용자 ID: {}", userId);
+		@PathVariable("userId") ReservationSearchIdInfo.ReservationSearchIdRequest request) {
+		List<ReservationSearchIdInfo.ReservationSearchIdResponse> responses = reservationService.getUserReservations(
+			request);
+		log.info("사용자 예약 내역 조회 성공 - 사용자 ID: {}", request);
 		return ResponseEntity.ok(responses);
 	}
 }
