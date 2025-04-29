@@ -2,6 +2,8 @@ package com.example.screen_golf.room.service;
 
 import static com.example.screen_golf.room.dto.RoomCreateInfo.RoomCreateRequest.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +15,7 @@ import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomUpdateException;
 import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.RoomType;
+import com.example.screen_golf.room.dto.AvailableRoomInfo;
 import com.example.screen_golf.room.dto.FindRoomType;
 import com.example.screen_golf.room.dto.RoomCreateInfo;
 import com.example.screen_golf.room.dto.RoomDeleteInfo;
@@ -135,6 +138,33 @@ public class RoomServiceImpl implements RoomService {
 			log.error("deleteRoom 예외 발생: {}", e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	@Override
+	public List<AvailableRoomInfo.AvailableRoomResponse> availableRoom(
+		AvailableRoomInfo.AvailableRoomRequest availableRoomRequest) {
+
+		LocalDate reservationDate = availableRoomRequest.getReservationDate();
+		LocalTime startTime = availableRoomRequest.getStartTime();
+		int userCount = availableRoomRequest.getUserCount();
+		RoomType roomType = availableRoomRequest.getRoomType();
+		int durationInHours = availableRoomRequest.getDurationInHours(); // 추가된 파라미터
+
+		LocalTime endTime = startTime.plusHours(durationInHours);
+
+		List<Room> availableRooms = roomRepository.findAvailableRooms(
+			reservationDate, startTime, durationInHours, userCount, roomType);
+
+		List<AvailableRoomInfo.AvailableRoomResponse> roomInfoList = availableRooms.stream()
+			.map(room -> new AvailableRoomInfo.AvailableRoomResponse(
+				room.getId(),                        // roomId
+				room.getName(),                      // roomName
+				room.getRoomType(),                  // roomType
+				room.getRoomStatus(),                // roomStatus
+				room.getPricePerHour(),              // pricePerHour
+				room.getDescription()))              // description
+			.collect(Collectors.toList());         // 리스트로 수집
+		return roomInfoList;
 	}
 
 	private void updateRoom(RoomUpdateInfo.RoomUpdateRequest updateRequest, Room room) {
