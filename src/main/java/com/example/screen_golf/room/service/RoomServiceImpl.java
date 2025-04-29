@@ -148,7 +148,7 @@ public class RoomServiceImpl implements RoomService {
 		LocalTime startTime = availableRoomRequest.getStartTime();
 		int userCount = availableRoomRequest.getUserCount();
 		RoomType roomType = availableRoomRequest.getRoomType();
-		int durationInHours = availableRoomRequest.getDurationInHours(); // 추가된 파라미터
+회		int durationInHours = availableRoomRequest.getDurationInHours();
 
 		LocalTime endTime = startTime.plusHours(durationInHours);
 
