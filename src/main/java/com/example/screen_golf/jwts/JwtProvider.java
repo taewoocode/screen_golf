@@ -20,7 +20,8 @@ public class JwtProvider {
 
 	public JwtProvider(@Value("${GOLF_JWT_SECRET}") String secretKey,
 		@Value("${GOLF_JWT_EXPIRATION}") long expiration) {
-		this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		this.key = secretKey.length() >= 256 ? Keys.hmacShaKeyFor(secretKey.getBytes())
+			: Keys.secretKeyFor(SignatureAlgorithm.HS256);
 		this.expiration = expiration;
 	}
 
@@ -37,7 +38,7 @@ public class JwtProvider {
 			.setSubject(userId.toString())
 			.setIssuedAt(now)
 			.setExpiration(expirationDate)
-			.signWith(key, SignatureAlgorithm.ES256)
+			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
 
