@@ -16,6 +16,7 @@ import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomStateException;
 import com.example.screen_golf.exception.room.RoomTimeException;
 import com.example.screen_golf.exception.room.RoomUpdateException;
+import com.example.screen_golf.exception.user.InvalidPasswordException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,18 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Void> handleException(Exception e) {
 		log.error("서버 오류 발생: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	}
+
+	/**=========================================================================
+	 * 							USER 관련
+	 * =========================================================================
+	 */
+
+	// 로그인 관련 예외 (InvalidPasswordException) 처리
+	@ExceptionHandler(InvalidPasswordException.class)
+	public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
+		log.error("비밀번호 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 
 	/**=========================================================================
