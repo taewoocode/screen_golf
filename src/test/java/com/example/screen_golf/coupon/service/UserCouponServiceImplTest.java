@@ -21,7 +21,10 @@ import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserRole;
 import com.example.screen_golf.user.domain.UserStatus;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class UserCouponServiceImplTest {
 
 	@Mock
@@ -92,5 +95,4 @@ class UserCouponServiceImplTest {
 		assertThat(result.get(0).getName()).isEqualTo("Test Coupon");
 		assertThat(result.get(0).getDiscountAmount()).isEqualTo(100);
 	}
-
 }
