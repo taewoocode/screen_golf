@@ -1,5 +1,6 @@
 package com.example.screen_golf.user.service;
 
+import com.example.screen_golf.user.dto.UserLoginInfo;
 import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
 import com.example.screen_golf.user.dto.UserSignUpInfo;
@@ -26,5 +27,12 @@ public interface UserService {
 	 * @return
 	 */
 	UserLookUpName.UserLookUpNameResponse findUser(UserLookUpName.UserLookUpNameRequest request);
+
+	/**
+	 * email, password login
+	 * @param request
+	 * @return
+	 */
+	UserLoginInfo.UserLoginResponse login(UserLoginInfo.UserLoginRequest request);
 
 }
