@@ -21,7 +21,7 @@ public class UserLoginInfo {
 	@Builder
 	@Getter
 	public static class UserLoginResponse {
-		private String userId;
+		private Long userId;
 		private String email;
 		private String token;
 	}
