@@ -1,13 +1,18 @@
 package com.example.screen_golf.coupon.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.coupon.domain.CouponStatus;
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.UserCouponListInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
 import com.example.screen_golf.coupon.repository.UserCouponRepository;
@@ -108,6 +113,21 @@ public class UserCouponServiceImpl implements UserCouponService {
 			.createdAt(coupon.getCreatedAt())
 			.updatedAt(coupon.getUpdatedAt())
 			.build();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserCouponListInfo.UserCouponListResponse> getUserCouponsByUserId(
+		UserCouponCreateInfo.UserCouponCreateRequest request) {
+		LocalDateTime now = LocalDateTime.now();
+		CouponStatus unusedCoupon = CouponStatus.UNUSED;
+
+		List<UserCoupon> availableCoupons =
+			userCouponRepository.findAvailableCoupons(request.getUserId(), unusedCoupon, now);
+
+		return availableCoupons.stream()
+			.map(UserCouponListInfo.UserCouponListResponse::toDto)
+			.collect(Collectors.toList());
 	}
 
 	private static UserCouponCreateInfo.UserCouponCreateResponse getUserCouponCreateResponse(UserCoupon savedCoupon,
