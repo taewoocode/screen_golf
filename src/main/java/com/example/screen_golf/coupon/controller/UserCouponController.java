@@ -1,5 +1,7 @@
 package com.example.screen_golf.coupon.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.coupon.dto.UserCouponCreateInfo;
 import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.UserCouponListInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
 import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
 import com.example.screen_golf.coupon.service.UserCouponService;
@@ -92,5 +95,19 @@ public class UserCouponController {
 		UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse couponInfoByUserId =
 			userCouponService.findCouponInfoByUserId(userId);
 		return ResponseEntity.ok(couponInfoByUserId);
+	}
+
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_USER_COUPON_LIST_INFO_FROM_USER_ID,
+		description = SwaggerDocs.DESCRIPTION_USER_COUPON_LIST_INFO_FROM_USER_ID
+	)
+	@PostMapping
+	public ResponseEntity<List<UserCouponListInfo.UserCouponListResponse>> getAvailableUserCouponListByUserId(
+		@Parameter(description = "조회할 유저 Id", required = true)
+		@RequestBody UserCouponListInfo.UserCouponListRequest request
+	) {
+		List<UserCouponListInfo.UserCouponListResponse> userCouponsByUserId
+			= userCouponService.getUserCouponsByUserId(request);
+		return ResponseEntity.ok(userCouponsByUserId);
 	}
 }
