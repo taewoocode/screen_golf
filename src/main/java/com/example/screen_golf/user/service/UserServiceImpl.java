@@ -8,6 +8,7 @@ import com.example.screen_golf.jwts.JwtProvider;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserRole;
 import com.example.screen_golf.user.domain.UserStatus;
+import com.example.screen_golf.user.dto.UserLoginInfo;
 import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
 import com.example.screen_golf.user.dto.UserSignUpInfo;
@@ -138,5 +139,19 @@ public class UserServiceImpl implements UserService {
 			log.error("이름으로 회원 정보 조회 실패 (서버 오류) - 이름: {}", request.getName(), e);
 			throw new RuntimeException("이름으로 회원 정보 조회 중 오류가 발생했습니다.", e);
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserLoginInfo.UserLoginResponse login(UserLoginInfo.UserLoginRequest request) {
+		User user = userRepository.findByEmail(request.getEmail())
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			throw new IllegalArgumentException("비밀번호가 다릅니다.");
+		}
+
+		String generateToken = jwtProvider.generateToken(user.getId());
+		return new UserLoginInfo.UserLoginResponse((user.getId()), user.getEmail(), generateToken);
 	}
 }
