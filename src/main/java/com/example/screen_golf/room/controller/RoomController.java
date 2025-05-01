@@ -164,5 +164,4 @@ public class RoomController {
 		log.info("이용가능한 Room조회 성공={}", availableRoomRequest);
 		return ResponseEntity.ok(availableRoomResponses);
 	}
-
 }
