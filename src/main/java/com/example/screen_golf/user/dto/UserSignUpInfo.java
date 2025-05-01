@@ -12,6 +12,8 @@ public class UserSignUpInfo {
 	/** ########## 회원가입 DTO ########## **/
 	@Getter
 	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
 	public static class UserSignUpRequest {
 		private String email;
 		private String password;
@@ -29,5 +31,6 @@ public class UserSignUpInfo {
 		private String email;
 		private String name;
 		private UserRole role;
+		private String token;
 	}
 }

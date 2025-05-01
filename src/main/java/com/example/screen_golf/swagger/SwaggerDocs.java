@@ -15,6 +15,9 @@ public class SwaggerDocs {
 	public static final String SUMMARY_USER_INFO_BY_NAME = "이름으로 회원 정보 조회";
 	public static final String DESCRIPTION_USER_INFO_BY_NAME = "사용자 이름을 통해 회원 정보를 조회합니다.";
 
+	public static final String SUMMARY_USER_INFO_BY_LOGIN = "EMAIL, PASSWORD로 로그인";
+	public static final String DESCRIPTION_USER_INFO_BY_LOGIN = "EMAIL, PASSWORD로 로그인을 진행합니다.";
+
 	/**===================================================================
 	 *					 Reservation 관련 Swagger Docs
 	 * ===================================================================

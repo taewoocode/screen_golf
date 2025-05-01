@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.swagger.SwaggerDocs;
+import com.example.screen_golf.user.dto.UserLoginInfo;
 import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
 import com.example.screen_golf.user.dto.UserSignUpInfo;
@@ -56,5 +57,16 @@ public class UserController {
 		UserLookUpName.UserLookUpNameResponse response = userService.findUser(request);
 		log.info("이름으로 회원 정보 조회 성공 - 이름: {}", request.getName());
 		return ResponseEntity.ok(response);
+	}
+
+	@Operation(summary = SwaggerDocs.SUMMARY_USER_INFO_BY_LOGIN,
+		description = SwaggerDocs.DESCRIPTION_USER_INFO_BY_LOGIN)
+	@PostMapping("/login")
+	public ResponseEntity<UserLoginInfo.UserLoginResponse> login(
+		@Parameter(description = "로그인", required = true)
+		@RequestBody UserLoginInfo.UserLoginRequest request) {
+		UserLoginInfo.UserLoginResponse loginUser = userService.login(request);
+		log.info("로그인={}", loginUser);
+		return ResponseEntity.ok(loginUser);
 	}
 } 
