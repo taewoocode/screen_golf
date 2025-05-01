@@ -118,7 +118,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<UserCouponListInfo.UserCouponListResponse> getUserCouponsByUserId(
-		UserCouponCreateInfo.UserCouponCreateRequest request) {
+		UserCouponListInfo.UserCouponListRequest request) {
 		LocalDateTime now = LocalDateTime.now();
 		CouponStatus unusedCoupon = CouponStatus.UNUSED;
 

@@ -39,5 +39,5 @@ public interface UserCouponService {
 	 * User의 Id를 통해 User의 쿠폰리스트들을 조회
 	 */
 	List<UserCouponListInfo.UserCouponListResponse> getUserCouponsByUserId(
-		UserCouponCreateInfo.UserCouponCreateRequest request);
+		UserCouponListInfo.UserCouponListRequest request);
 }
