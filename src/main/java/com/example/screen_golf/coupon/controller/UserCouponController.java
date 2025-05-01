@@ -38,7 +38,7 @@ public class UserCouponController {
 		summary = SwaggerDocs.SUMMARY_CREATE_USER_COUPON,
 		description = SwaggerDocs.DESCRIPTION_CREATE_USER_COUPON
 	)
-	@PostMapping
+	@PostMapping("/create")
 	public ResponseEntity<UserCouponCreateInfo.UserCouponCreateResponse> createUserCoupon(
 		@Parameter(description = "발급할 쿠폰 정보", required = true)
 		@RequestBody UserCouponCreateInfo.UserCouponCreateRequest request
