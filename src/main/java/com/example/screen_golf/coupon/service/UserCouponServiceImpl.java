@@ -29,7 +29,6 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 	private final UserCouponRepository userCouponRepository;
 	private final UserRepository userRepository;
-	private final CouponRandomService couponRandomService;
 
 	/**
 	 * 사용자 쿠폰 삭제 기능
