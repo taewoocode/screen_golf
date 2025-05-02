@@ -1,0 +1,80 @@
+package com.example.screen_golf.payment.dto;
+
+import java.time.LocalDateTime;
+
+import com.example.screen_golf.coupon.domain.CouponPolicy;
+import com.example.screen_golf.coupon.domain.UserCoupon;
+import com.example.screen_golf.payment.domain.Payment;
+import com.example.screen_golf.payment.domain.PaymentStatus;
+import com.example.screen_golf.reservation.domain.ReservationStatus;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+public class PaymentInfo {
+
+	/**
+	 * 결제 요청 DTO
+	 */
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PaymentRequest {
+		private Long reservationId;      // 예약 ID
+		private Integer amount;          // 결제 금액
+		private String paymentMethod;    // 결제 수단 (CARD, TRANSFER 등)
+		private Long userCouponId;       // 사용할 쿠폰 ID (선택사항)
+	}
+
+	/**
+	 * 결제 상태 업데이트 DTO
+	 */
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PaymentStatusUpdateRequest {
+		private String status;           // 결제 상태 (COMPLETED, FAILED, REFUNDED)
+		private String transactionId;    // 거래 ID (선택사항)
+	}
+
+	/**
+	 * 결제 응답 DTO
+	 */
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PaymentResponse {
+		private Long paymentId;          // 결제 ID
+		private Long reservationId;      // 예약 ID
+		private Long userId;             // 사용자 ID
+		private Integer amount;          // 결제 금액
+		private String paymentMethod;    // 결제 수단
+		private PaymentStatus status;    // 결제 상태
+		private String transactionId;    // 거래 ID
+		private LocalDateTime createdAt; // 결제 생성 시간
+		private ReservationStatus reservationStatus; // 예약 상태
+		private CouponPolicy couponPolicy; // 사용된 쿠폰 정책
+		private Integer discountAmount;  // 할인 금액
+
+		public static PaymentResponse toDto(Payment payment, UserCoupon userCoupon) {
+			return PaymentResponse.builder()
+				.paymentId(payment.getId())
+				.reservationId(payment.getReservation().getId())
+				.userId(payment.getUser().getId())
+				.amount(payment.getAmount())
+				.paymentMethod(payment.getPaymentMethod())
+				.status(payment.getStatus())
+				.transactionId(payment.getTransactionId())
+				.createdAt(payment.getCreatedAt())
+				.reservationStatus(payment.getReservation().getStatus())
+				.couponPolicy(userCoupon != null ? userCoupon.getCouponPolicy() : null)
+				.discountAmount(userCoupon != null ? userCoupon.getCouponPolicy().calculateDiscount(payment.getAmount()) : 0)
+				.build();
+		}
+	}
+}

@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
+import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.RoomType;
 
 import lombok.AllArgsConstructor;
@@ -66,11 +67,14 @@ public class ReservationCreateInfo {
 	@AllArgsConstructor
 	public static class ReservationCreateRequest {
 		private Long userId;
+		private Room roomId;
 		private LocalDate date;
 		private RoomType roomType;        // 예약할 때 선택한 룸 타입 (예: STANDARD, PREMIUM, VIP)
 		private LocalTime startTime;
 		private LocalTime endTime;
+		private Integer userCount;
 		private String memo;
+		private Object durationInHours;
 
 		/**
 		 * 예약 요청 정보를 LocalDateTime으로 변환한다.
@@ -79,9 +83,9 @@ public class ReservationCreateInfo {
 			return LocalDateTime.of(date, startTime);
 		}
 
-		public LocalDateTime getReservationEndDateTime() {
-			return LocalDateTime.of(date, endTime);
-		}
+		// public LocalDate getReservationEndDateTime() {
+		// 	return LocalDateTime.of(date, endTime);
+		// }
 
 		/**
 		 * 운영시간(11:00 ~ 22:00) 내에 예약 시간이 유효한지 검증한다.

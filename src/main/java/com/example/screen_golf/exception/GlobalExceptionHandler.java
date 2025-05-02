@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.example.screen_golf.exception.coupon.CouponNotFoundException;
+import com.example.screen_golf.exception.payment.PaymentNotCompletedException;
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
+import com.example.screen_golf.exception.reservation.ReservationNotFoundExcpetion;
 import com.example.screen_golf.exception.reservation.ReservationValidationException;
-import com.example.screen_golf.exception.reservation.ResourceNotFoundException;
 import com.example.screen_golf.exception.room.RoomCreateException;
 import com.example.screen_golf.exception.room.RoomNotFoundException;
 import com.example.screen_golf.exception.room.RoomStateException;
@@ -65,8 +66,8 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 	}
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException e) {
+	@ExceptionHandler(ReservationNotFoundExcpetion.class)
+	public ResponseEntity<String> handleResourceNotFoundException(ReservationNotFoundExcpetion e) {
 		log.error("리소스 조회 실패: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 	}
@@ -153,4 +154,17 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 
 	}
+
+	/**=========================================================================
+	 *                           Payment 관련
+	 * =========================================================================
+	 */
+
+	@ExceptionHandler(PaymentNotCompletedException.class)
+	public ResponseEntity<String> handleCouponNotFoundException(PaymentNotCompletedException e) {
+		log.error("결제 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+	}
+
 }

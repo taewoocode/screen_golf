@@ -1,22 +1,25 @@
 package com.example.screen_golf.payment.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.screen_golf.payment.domain.Payment;
+import com.example.screen_golf.jwts.CustomUserDetails;
+import com.example.screen_golf.payment.dto.PaymentInfo;
 import com.example.screen_golf.payment.service.PaymentService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@Tag(name = "Payment", description = "결제관련 API 입니다.")
+@RequestMapping("/api/payments")
+@Tag(name = "Payment", description = "결제 관련 API")
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
@@ -28,13 +31,18 @@ public class PaymentController {
 		description = SwaggerDocs.DESCRIPTION_REQUEST_PAYMENT
 	)
 	@PostMapping
-	public ResponseEntity<Payment.PaymentResponse> requestPayment(
-		@Parameter(name = "결제 요청 정보", required = true)
-		@RequestBody Payment.PaymentRequest request
+	public ResponseEntity<PaymentInfo.PaymentResponse> requestPayment(
+		@RequestBody PaymentInfo.PaymentRequest request,
+		@AuthenticationPrincipal CustomUserDetails userDetails
 	) {
-		Payment.PaymentResponse paymentResponse = paymentService.requestPayment(request);
-		log.info("결제 요청 성공 - Payment ID={}, 사용자 ID={}", paymentResponse.getPaymentId(), paymentResponse.getUserId());
-		return ResponseEntity.ok(paymentResponse);
+		log.info("결제 요청 - 예약 ID: {}, 금액: {}, 결제 수단: {}", 
+			request.getReservationId(), request.getAmount(), request.getPaymentMethod());
+		
+		PaymentInfo.PaymentResponse response = paymentService.requestPayment(request);
+		
+		log.info("결제 처리 완료 - 결제 ID: {}, 상태: {}", 
+			response.getPaymentId(), response.getStatus());
+		
+		return ResponseEntity.ok(response);
 	}
-
 }

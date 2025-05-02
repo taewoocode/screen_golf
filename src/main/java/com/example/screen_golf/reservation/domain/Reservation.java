@@ -1,6 +1,7 @@
 package com.example.screen_golf.reservation.domain;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -65,12 +66,12 @@ public class Reservation {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Reservation(User user, Room room, LocalDateTime startTime, LocalDateTime endTime, String memo) {
+	public Reservation(User user, Room room, LocalDateTime startTime, LocalDateTime endTime, String memo, ReservationStatus status) {
 		this.user = user;
 		this.room = room;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.status = ReservationStatus.PENDING;
+		this.status = status;
 		this.memo = memo;
 	}
 
@@ -82,5 +83,39 @@ public class Reservation {
 
 	public void changeStatus(ReservationStatus status) {
 		this.status = status;
+	}
+
+	public Integer calculateTotalAmount() {
+		long hours = ChronoUnit.HOURS.between(startTime, endTime);
+		return (int) (hours * room.getPricePerHour());
+	}
+
+	public boolean isAvailableForReservation() {
+		return status == ReservationStatus.PENDING || status == ReservationStatus.CONFIRMED;
+	}
+
+	public boolean isCancellable() {
+		return status == ReservationStatus.PENDING || status == ReservationStatus.CONFIRMED;
+	}
+
+	public void cancel() {
+		if (!isCancellable()) {
+			throw new IllegalStateException("취소할 수 없는 예약 상태입니다.");
+		}
+		this.status = ReservationStatus.CANCELLED;
+	}
+
+	public void confirm() {
+		if (status != ReservationStatus.PENDING) {
+			throw new IllegalStateException("확정할 수 없는 예약 상태입니다.");
+		}
+		this.status = ReservationStatus.CONFIRMED;
+	}
+
+	public void complete() {
+		if (status != ReservationStatus.CONFIRMED) {
+			throw new IllegalStateException("완료할 수 없는 예약 상태입니다.");
+		}
+		this.status = ReservationStatus.COMPLETED;
 	}
 } 

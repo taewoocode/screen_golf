@@ -69,7 +69,7 @@ public class RoomUpdateInfo {
 				.reservationDate(room.getReservationDate())
 				.startTime(room.getStartTime())
 				.endTime(room.getEndTime())
-				.userCount(room.getUserCount())
+				.userCount(room.getCapacity())
 				.createdAt(room.getCreatedAt())
 				.updatedAt(room.getUpdatedAt())
 				.build();

@@ -7,14 +7,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.Getter;
+
 public class CustomUserDetails implements UserDetails {
 
-	private final String username;
+	@Getter
+	private final Long userId;
+
+	private final String email;
 	private final String password;
 	private final List<SimpleGrantedAuthority> authorities;
 
-	public CustomUserDetails(String username, String password, List<SimpleGrantedAuthority> authorities) {
-		this.username = username;
+	public CustomUserDetails(Long userId, String email, String password, List<SimpleGrantedAuthority> authorities) {
+		this.userId = userId;
+		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
 	}
@@ -31,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return username;
+		return email;  // username은 이메일로 처리
 	}
 
 	@Override

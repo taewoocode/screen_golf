@@ -2,6 +2,7 @@ package com.example.screen_golf.coupon.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.screen_golf.coupon.domain.CouponPolicy;
 import com.example.screen_golf.coupon.domain.CouponStatus;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +23,7 @@ public class UserCouponSearchCouponIdInfo {
 		private Long id;
 		private Long userId;
 		private String couponCode;
-		private String name;
-		private Integer discountAmount;
+		private CouponPolicy couponPolicy;  // 쿠폰 정책을 포함
 		private LocalDateTime validFrom;
 		private LocalDateTime validTo;
 		private CouponStatus status;

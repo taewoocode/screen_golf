@@ -63,10 +63,6 @@ public class RoomCreateInfo {
 				.roomType(createRequest.getRoomType())
 				.pricePerHour(createRequest.getPricePerHour())
 				.description(createRequest.getDescription())
-				.reservationDate(createRequest.getReservationDate())
-				.startTime(createRequest.getStartTime())
-				.endTime(createRequest.getStartTime().plusHours(createRequest.getUsageDurationInHours()))
-				.userCount(createRequest.getUserCount())
 				.build();
 			return room;
 		}
@@ -105,7 +101,7 @@ public class RoomCreateInfo {
 				.reservationDate(room.getReservationDate())
 				.startTime(room.getStartTime())
 				.endTime(room.getEndTime())
-				.userCount(room.getUserCount())
+				.userCount(room.getCapacity())
 				.createdAt(room.getCreatedAt())
 				.updatedAt(room.getUpdatedAt())
 				.build();

@@ -58,13 +58,13 @@ public class Room {
 	 * Room_타입 - Standard, Premium, VIP
 	 */
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(name = "room_type", nullable = false)
 	private RoomType roomType;
 
 	/**
 	 * 시간당 가격
 	 */
-	@Column(nullable = false)
+	@Column(name = "price_per_hour", nullable = false)
 	private Integer pricePerHour;
 
 	/**
@@ -97,7 +97,7 @@ public class Room {
 	 */
 	// 예약 또는 Room 사용 시의 인원 정보
 	@Column(nullable = false)
-	private Integer userCount;
+	private Integer capacity;
 
 	@OneToMany(mappedBy = "room")
 	private List<Reservation> reservations = new ArrayList<>();
@@ -111,17 +111,12 @@ public class Room {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Room(String name, RoomStatus status, RoomType roomType, Integer pricePerHour, String description,
-		LocalDate reservationDate, LocalTime startTime, LocalTime endTime, Integer userCount) {
+	public Room(String name, RoomType roomType, RoomStatus status, Integer pricePerHour, String description) {
 		this.name = name;
-		this.status = status;
 		this.roomType = roomType;
+		this.status = status;
 		this.pricePerHour = pricePerHour;
 		this.description = description;
-		this.reservationDate = reservationDate;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.userCount = userCount;
 	}
 
 	public void updateRoomInfo(String name, Integer pricePerHour, String description) {
@@ -159,8 +154,8 @@ public class Room {
 		this.pricePerHour = pricePerHour;
 	}
 
-	public void updateUserCount(Integer userCount) {
-		this.userCount = userCount;
+	public void updateUserCount(Integer capacity) {
+		this.capacity = capacity;
 	}
 
 	public void updateRoomDescription(String description) {
