@@ -22,4 +22,6 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
 	List<UserCoupon> findAvailableCoupons(@Param("userId") Long userId,
 		@Param("status") CouponStatus status,
 		@Param("now") LocalDateTime now);
+
+	boolean existsByUserAndCreatedAtBetween(User user, LocalDateTime start, LocalDateTime end);
 }
