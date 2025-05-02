@@ -3,6 +3,7 @@ package com.example.screen_golf.room.service;
 import static com.example.screen_golf.room.dto.RoomCreateInfo.RoomCreateRequest.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import com.example.screen_golf.room.dto.RoomCreateInfo;
 import com.example.screen_golf.room.dto.RoomDeleteInfo;
 import com.example.screen_golf.room.dto.RoomFindInfo;
 import com.example.screen_golf.room.dto.RoomUpdateInfo;
-import com.example.screen_golf.room.respository.RoomRepository;
+import com.example.screen_golf.room.repository.RoomRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,19 +153,22 @@ public class RoomServiceImpl implements RoomService {
 
 		LocalTime endTime = startTime.plusHours(durationInHours);
 
-		List<Room> availableRooms = roomRepository.findAvailableRooms(
-			reservationDate, startTime, durationInHours, userCount, roomType);
+		LocalDateTime startDateTime = LocalDateTime.of(reservationDate, startTime);
+		LocalDateTime endDateTime = LocalDateTime.of(reservationDate, endTime);
 
-		List<AvailableRoomInfo.AvailableRoomResponse> roomInfoList = availableRooms.stream()
+		List<Room> availableRooms = roomRepository.findAvailableRooms(
+			startDateTime, endDateTime, userCount, roomType
+		);
+
+		return availableRooms.stream()
 			.map(room -> new AvailableRoomInfo.AvailableRoomResponse(
-				room.getId(),                        // roomId
-				room.getName(),                      // roomName
-				room.getRoomType(),                  // roomType
-				room.getRoomStatus(),                // roomStatus
-				room.getPricePerHour(),              // pricePerHour
-				room.getDescription()))              // description
-			.collect(Collectors.toList());         // 리스트로 수집
-		return roomInfoList;
+				room.getId(),
+				room.getName(),
+				room.getRoomType(),
+				room.getRoomStatus(),
+				room.getPricePerHour(),
+				room.getDescription()))
+			.collect(Collectors.toList());
 	}
 
 	private void updateRoom(RoomUpdateInfo.RoomUpdateRequest updateRequest, Room room) {
