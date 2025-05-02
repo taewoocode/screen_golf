@@ -28,34 +28,34 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public class PaymentHistory {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_id", nullable = false)
-    private Payment payment;
+	@ManyToOne
+	@JoinColumn(name = "payment_id", nullable = false)
+	private Payment payment;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentStatus previousStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private PaymentStatus previousStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentStatus newStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private PaymentStatus newStatus;
 
-    private String reason;
+	private String reason;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+	@CreatedDate
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    @Builder
-    public PaymentHistory(Payment payment, PaymentStatus previousStatus, 
-                         PaymentStatus newStatus, String reason) {
-        this.payment = payment;
-        this.previousStatus = previousStatus;
-        this.newStatus = newStatus;
-        this.reason = reason;
-    }
+	@Builder
+	public PaymentHistory(Payment payment, PaymentStatus previousStatus,
+		PaymentStatus newStatus, String reason) {
+		this.payment = payment;
+		this.previousStatus = previousStatus;
+		this.newStatus = newStatus;
+		this.reason = reason;
+	}
 } 
