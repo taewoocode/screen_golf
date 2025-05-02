@@ -36,8 +36,8 @@ public class UserCouponListInfo {
 			return UserCouponListResponse.builder()
 				.id(coupon.getId())
 				.couponCode(coupon.getCouponCode())
-				.name(coupon.getName())
-				.discountAmount(coupon.getDiscountAmount())
+				// .name(coupon.getName())
+				// .discountAmount(coupon.getDiscountAmount())
 				.validFrom(coupon.getValidFrom())
 				.validTo(coupon.getValidTo())
 				.status(coupon.getStatus().name()) // Enum을 String으로 반환
