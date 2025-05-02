@@ -14,6 +14,7 @@ import com.example.screen_golf.coupon.domain.CouponPolicy;
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.coupon.repository.UserCouponRepository;
 import com.example.screen_golf.user.domain.User;
+import com.example.screen_golf.user.domain.UserStatus;
 import com.example.screen_golf.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class CouponRandomService {
 	@Scheduled(cron = "0 0 0 1 * ?")
 	@Transactional
 	public void issueMonthlyCouponToAllUsers() {
-		List<User> users = userRepository.findAllByActiveTrue();
+		List<User> users = userRepository.findAllByStatus(UserStatus.ACTIVE);
 		YearMonth currentMonth = YearMonth.now();
 
 		for (User user : users) {
