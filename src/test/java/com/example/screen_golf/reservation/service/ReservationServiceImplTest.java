@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.reservation.repository.ReservationRepository;
-import com.example.screen_golf.room.respository.RoomRepository;
+import com.example.screen_golf.room.repository.RoomRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserRole;
 import com.example.screen_golf.user.domain.UserStatus;
@@ -29,7 +28,7 @@ class ReservationServiceImplTest {
 
 	@Mock
 	private DiscountPolicy discountPolicy; // DiscountPolicy Mock
-	private final DiscountPolicy discountPolicy2 = new RateAmountCountPolicy();
+	// private final DiscountPolicy discountPolicy2 = new RateAmountCountPolicy();
 	@Mock
 	private UserRepository userRepository; // 추가된 의존성
 
@@ -43,9 +42,9 @@ class ReservationServiceImplTest {
 	private ReservationServiceImpl reservationService; // 테스트 대상
 
 	// UserCoupon 생성 메서드
-	public UserCoupon createUserCoupon(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-		return new UserCoupon(user, "TESTCODE", "KAKAO", 10000, startDateTime, endDateTime);
-	}
+	// public UserCoupon createUserCoupon(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+	// 	return new UserCoupon(user, "TESTCODE", "KAKAO", 10000, startDateTime, endDateTime);
+	// }
 
 	// @Test
 	// @DisplayName("예약 설정을 11시 이전으로 하면 테스트가 실패합니다.")
@@ -162,7 +161,7 @@ class ReservationServiceImplTest {
 		//할인율 10퍼센트 적용
 		ReflectionTestUtils.setField(coupon, "discountAmount", 10);
 
-		DiscountPolicy discountPolicy = new RateAmountCountPolicy();
+		// DiscountPolicy discountPolicy = new RateAmountCountPolicy();
 
 		BigDecimal calculatedPrice = discountPolicy.applyDiscount(originalPrice, coupon);
 		BigDecimal expectedPrice = BigDecimal.valueOf(9000.0);
