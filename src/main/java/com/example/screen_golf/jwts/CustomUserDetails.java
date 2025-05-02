@@ -9,11 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
+	private final Long userId;
+
 	private final String username;
 	private final String password;
 	private final List<SimpleGrantedAuthority> authorities;
 
-	public CustomUserDetails(String username, String password, List<SimpleGrantedAuthority> authorities) {
+	public CustomUserDetails(Long userId, String username, String password, List<SimpleGrantedAuthority> authorities) {
+		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
