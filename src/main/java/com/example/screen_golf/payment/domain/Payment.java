@@ -22,7 +22,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -85,43 +84,5 @@ public class Payment {
 
 	public void refund() {
 		this.status = PaymentStatus.REFUNDED;
-	}
-
-	/**
-	 * ============================================================
-	 *                         PaymentDTO
-	 * ============================================================
-	 */
-
-	/**
-	 * // 결제 응답 DTO: 결제 처리 후 클라이언트가 요청하는 정가
-	 */
-	@Getter
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class PaymentRequest {
-		private Long reservationId;
-		private Long userId;
-		private Integer amount;
-		private String paymentMethod;
-	}
-
-	/**
-	 * // 결제 응답 DTO: 결제 처리 후 클라이언트에 반환하는 정보
-	 */
-	@Getter
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class PaymentResponse {
-		private Long paymentId;       // 생성된 Payment 엔티티의 식별자
-		private Long reservationId;
-		private Long userId;
-		private Integer amount;
-		private String paymentMethod;
-		private String status;        // PaymentStatus의 값 (예: PENDING, COMPLETED, FAILED, REFUNDED)
-		private String transactionId; // 결제 완료 후 외부 결제 시스템에서 발급한 거래 식별자, 있을 경우
-		private LocalDateTime createdAt;
 	}
 } 
