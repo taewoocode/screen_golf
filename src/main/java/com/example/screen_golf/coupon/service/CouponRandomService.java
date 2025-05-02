@@ -1,6 +1,7 @@
 package com.example.screen_golf.coupon.service;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -22,31 +23,48 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class CouponRandomService {
+
 	private final UserRepository userRepository;
 	private final UserCouponRepository userCouponRepository;
 
 	private static final Random random = new Random();
+	private static final int COUPON_VALID_DAYS = 50;
 
-	//매월 1일 쿠폰을 발급한다.
+	// 매월 1일 00:00에 실행
 	@Scheduled(cron = "0 0 0 1 * ?")
 	@Transactional
 	public void issueMonthlyCouponToAllUsers() {
-		List<User> users = userRepository.findAll();
+		List<User> users = userRepository.findAllByActiveTrue();
+		YearMonth currentMonth = YearMonth.now();
+
 		for (User user : users) {
+			if (hasAlreadyIssuedCouponThisMonth(user, currentMonth)) {
+				log.info("이미 발급됨 - userId: {}", user.getId());
+				continue;
+			}
+
 			CouponPolicy randomPolicy = getRandomPolicy();
 			UserCoupon userCoupon = createUserCoupon(user, randomPolicy);
 			userCouponRepository.save(userCoupon);
+
+			log.info("쿠폰 발급 완료 - userId: {}, policy: {}", user.getId(), randomPolicy.name());
 		}
 	}
 
-	private UserCoupon createUserCoupon(User user, CouponPolicy randomPolicy) {
+	private boolean hasAlreadyIssuedCouponThisMonth(User user, YearMonth currentMonth) {
+		LocalDateTime startOfMonth = currentMonth.atDay(1).atStartOfDay();
+		LocalDateTime endOfMonth = currentMonth.atEndOfMonth().atTime(23, 59, 59);
+		return userCouponRepository.existsByUserAndCreatedAtBetween(user, startOfMonth, endOfMonth);
+	}
+
+	private UserCoupon createUserCoupon(User user, CouponPolicy policy) {
 		LocalDateTime now = LocalDateTime.now();
 		return UserCoupon.builder()
 			.user(user)
 			.couponCode(UUID.randomUUID().toString())
-			.couponPolicy(randomPolicy)
+			.couponPolicy(policy)
 			.validFrom(now)
-			.validTo(now.plusDays(50))
+			.validTo(now.plusDays(COUPON_VALID_DAYS))
 			.build();
 	}
 
