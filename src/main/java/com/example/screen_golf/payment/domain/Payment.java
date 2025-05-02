@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.user.domain.User;
 
@@ -38,12 +39,16 @@ public class Payment {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id")
 	private User user;
 
 	@OneToOne
-	@JoinColumn(name = "reservation_id", nullable = false)
+	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
+
+	@ManyToOne
+	@JoinColumn(name = "user_coupon_id")
+	private UserCoupon userCoupon;
 
 	@Column(nullable = false)
 	private Integer amount;
@@ -52,12 +57,14 @@ public class Payment {
 	@Column(nullable = false)
 	private PaymentStatus status;
 
+	@Column(name = "payment_method", nullable = false)
 	private String paymentMethod;
 
+	@Column(name = "transaction_id")
 	private String transactionId;
 
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
 	@LastModifiedDate
@@ -65,12 +72,35 @@ public class Payment {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Payment(User user, Reservation reservation, Integer amount, String paymentMethod) {
+	public Payment(User user, Reservation reservation, Integer amount,
+		PaymentStatus status, String paymentMethod, String transactionId) {
 		this.user = user;
 		this.reservation = reservation;
 		this.amount = amount;
-		this.status = PaymentStatus.PENDING;
+		this.status = status;
 		this.paymentMethod = paymentMethod;
+		this.transactionId = transactionId;
+		this.createdAt = LocalDateTime.now();
+	}
+
+	public void updateStatus(PaymentStatus status, String transactionId) {
+		this.status = status;
+		this.transactionId = transactionId;
+	}
+
+	/**
+	 * 정적 팩토리 메서드를 통해 Payment 객체를 생성합니다.
+	 * 초기 상태는 PENDING으로 설정됩니다.
+	 */
+	public static Payment createPayment(Long user, Reservation reservation, Integer amount, String paymentMethod,
+		UserCoupon userCoupon) {
+		Payment payment = new Payment();
+		payment.reservation = reservation;
+		payment.amount = amount;
+		payment.paymentMethod = paymentMethod;
+		payment.status = PaymentStatus.PENDING;
+		payment.userCoupon = userCoupon;
+		return payment;
 	}
 
 	public void completePayment(String transactionId) {
@@ -85,4 +115,4 @@ public class Payment {
 	public void refund() {
 		this.status = PaymentStatus.REFUNDED;
 	}
-} 
+}
