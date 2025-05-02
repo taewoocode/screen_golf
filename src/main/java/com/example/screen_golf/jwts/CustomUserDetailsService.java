@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.screen_golf.user.domain.UserStatus;
 import com.example.screen_golf.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,18 @@ public class CustomUserDetailsService implements org.springframework.security.co
 	private final UserRepository userRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String userIdAsString) {
-		Long userId = Long.parseLong(userIdAsString);
-		com.example.screen_golf.user.domain.User user = userRepository.findById(userId)
-			.orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+	public UserDetails loadUserByUsername(String username) {
+		com.example.screen_golf.user.domain.User user = userRepository.findByEmail(username)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new UsernameNotFoundException("User is not active");
+		}
+
 		List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+
+		// userId를 CustomUserDetails 생성자에 추가
 		return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), authorities);
 	}
+
 }
