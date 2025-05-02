@@ -2,6 +2,8 @@ package com.example.screen_golf.payment.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.screen_golf.coupon.domain.CouponPolicy;
+import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
 
 import lombok.AllArgsConstructor;
@@ -19,10 +21,10 @@ public class PaymentInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class PaymentRequest {
-		private Long reservationId;     // 이미 생성된 예약 ID (PENDING 상태)
-		private Long userId;            // 결제하는 사용자 ID
-		private Integer amount;         // 최종 결제 금액 (쿠폰 적용된 값)
-		private String paymentMethod;   // 예: CARD, KAKAO_PAY 등
+		private Long reservationId;
+		private Integer amount;
+		private String paymentMethod;
+		private UserCoupon userCoupon;
 	}
 
 	/**
@@ -42,5 +44,6 @@ public class PaymentInfo {
 		private String transactionId;
 		private LocalDateTime createdAt;
 		private ReservationStatus reservationStatus;
+		private CouponPolicy couponPolicy;
 	}
 }
