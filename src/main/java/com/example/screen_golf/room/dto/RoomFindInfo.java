@@ -40,7 +40,7 @@ public class RoomFindInfo {
 				room.getReservationDate(),
 				room.getStartTime(),
 				room.getEndTime(),
-				room.getUserCount()
+				room.getCapacity()
 			);
 		}
 	}
