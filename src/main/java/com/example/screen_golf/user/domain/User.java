@@ -40,12 +40,6 @@ public class User {
 	@Column(nullable = false)
 	private String name;
 
-	/**
-	 * 단방향 연관관계 리팩토링
-	 */
-	// @OneToMany(mappedBy = "user")
-	// private List<UserCoupon> userCoupons = new ArrayList<>();
-
 	private String phone;
 
 	@Enumerated(EnumType.STRING)
@@ -58,9 +52,6 @@ public class User {
 
 	private String profileImage;
 
-	// @OneToMany(mappedBy = "user")
-	// private List<Reservation> reservations = new ArrayList<>();
-
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -69,6 +60,14 @@ public class User {
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
 
+	/**
+	 * 단방향 연관관계 리팩토링
+	 */
+	// @OneToMany(mappedBy = "user")
+	// private List<Coupon> userCoupons = new ArrayList<>();
+
+	// @OneToMany(mappedBy = "user")
+	// private List<Reservation> reservations = new ArrayList<>();
 	@Builder
 	public User(String email, String password, String name, String phone, UserRole role, UserStatus status,
 		String profileImage) {
