@@ -6,7 +6,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -19,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,11 +25,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_coupons")
+@Table(name = "coupons")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class UserCoupon {
+public class Coupon {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,19 +40,15 @@ public class UserCoupon {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	/** 쿠폰 정책 연관 */
+	/** 쿠폰 정책 타입 - enum을 직접 저장 */
+	@Enumerated(EnumType.STRING)
+	@Column(name = "coupon_policy", nullable = false)
+	private CouponPolicy couponPolicy;
+
 	/** 쿠폰 식별 코드 */
 	@Column(nullable = false)
 	private String couponCode;
-
-	/** 쿠폰 정책 */
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private CouponPolicy couponPolicy;  // 쿠폰 정책을 저장
-
-	/** 결제 연관 */
-	@OneToOne
-	@JoinColumn(name = "payment_id")
-	private Payment payment;  // 결제에 연결된 정보
 
 	/** 유효 기간 */
 	@Column(nullable = false)
@@ -70,27 +64,37 @@ public class UserCoupon {
 
 	/** 생성/수정 시간 */
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	@Column(nullable = false)
+	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
+	@Column(nullable = false)
+	private boolean used;
+
 	@Builder
-	public UserCoupon(User user, String couponCode, CouponPolicy couponPolicy,
+	public Coupon(User user, String couponCode, CouponPolicy couponPolicy,
 		LocalDateTime validFrom, LocalDateTime validTo) {
 		this.user = user;
 		this.couponCode = couponCode;
 		this.couponPolicy = couponPolicy;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
-		this.status = CouponStatus.UNUSED;
+		this.used = false;
+	}
+
+	public boolean isAvailable() {
+		return !used;
 	}
 
 	/** 사용 처리 */
 	public void use() {
-		this.status = CouponStatus.USED;
+		if (used) {
+			throw new IllegalStateException("이미 사용된 쿠폰입니다.");
+		}
+		this.used = true;
 	}
 
 	/** 만료 처리 */
