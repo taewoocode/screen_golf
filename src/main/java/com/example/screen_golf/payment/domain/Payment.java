@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.screen_golf.coupon.domain.Coupon;
+import com.example.screen_golf.room.domain.RoomPrice;
 import com.example.screen_golf.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -40,6 +41,10 @@ public class Payment {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+
+	@ManyToOne
+	@JoinColumn(name = "room_price_id", nullable = false)
+	private RoomPrice roomPrice;
 
 	@OneToOne
 	@JoinColumn(name = "user_coupon_id")
