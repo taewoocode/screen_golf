@@ -6,17 +6,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponStatus;
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.coupon.repository.CouponRepository;
 import com.example.screen_golf.exception.payment.PaymentNotCompletedException;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentInfo;
 import com.example.screen_golf.payment.repository.PaymentRepository;
 import com.example.screen_golf.reservation.domain.Reservation;
-import com.example.screen_golf.reservation.repository.ReservationRepository;
-import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.domain.RoomPrice;
 import com.example.screen_golf.room.repository.RoomPriceRepository;
 import com.example.screen_golf.room.repository.RoomRepository;
@@ -33,8 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	private final PaymentRepository paymentRepository;
 	private final UserRepository userRepository;
-	private final UserCouponRepository couponRepository;
-	private final ReservationRepository reservationRepository;
+	private final CouponRepository couponRepository;
 	private final RoomRepository roomRepository;
 	private final RoomPriceRepository roomPriceRepository;
 
@@ -50,18 +47,17 @@ public class PaymentServiceImpl implements PaymentService {
 		User user = userRepository.findById(request.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-		Room room = roomRepository.findById(request.getRoomId())
-			.orElseThrow(() -> new IllegalArgumentException("방을 찾을 수 없습니다."));
+		// 룸 가격정보 조회
+		RoomPrice roomPrice = roomPriceRepository.findByRoom(request.getRoomPriceId())
+			.orElseThrow(() -> new IllegalArgumentException("해당 가격 정보를 찾을 수 없습니다."));
 
-		RoomPrice roomPrice = roomPriceRepository.findByRoom(room)
-			.orElseThrow(() -> new IllegalArgumentException("해당 방에 대한 가격 정보가 없습니다."));
+		// 사용가능한 쿠폰정보 조회
+		List<Coupon> availableCoupons = couponRepository.findAvailableCoupons(user.getId(), CouponStatus.UNUSED,
+			LocalDateTime.now());
 
 		Integer price = roomPrice.getPrice();
 
-		List<UserCoupon> availableCoupons = couponRepository.findAvailableCoupons(user.getId(), CouponStatus.UNUSED,
-			LocalDateTime.now());
-
-		UserCoupon coupon = null;
+		Coupon coupon = null;
 		Integer discountAmount = 0;
 		Integer finalAmount = price;
 
@@ -79,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
 			if (!coupon.isAvailable()) {
 				throw new IllegalArgumentException("이미 사용된 쿠폰입니다.");
 			}
-			
+
 			discountAmount = coupon.calculateDiscount(price);
 			finalAmount = price - discountAmount;
 			if (finalAmount < 0) {
@@ -119,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 		try {
 			// 결제 금액 계산 전에 쿠폰이 있으면 적용하여 할인 금액을 계산
-			UserCoupon coupon = payment.getCoupon();
+			Coupon coupon = payment.getCoupon();
 			if (coupon != null) {
 				int discountAmount = coupon.calculateDiscount(payment.getAmount());
 				payment = payment.builder()
@@ -153,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
-	private void processPaymentApproval(Payment payment, UserCoupon coupon) {
+	private void processPaymentApproval(Payment payment, Coupon coupon) {
 		try {
 			// 결제 승인 처리
 			log.info("결제 승인 처리 시작: 결제 ID={}, 사용자 ID={}", payment.getId(), payment.getUser().getId());
