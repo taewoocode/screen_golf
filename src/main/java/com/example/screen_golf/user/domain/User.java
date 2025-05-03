@@ -8,7 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.reservation.domain.Reservation;
 
 import jakarta.persistence.Column;
@@ -46,8 +45,11 @@ public class User {
 	@Column(nullable = false)
 	private String name;
 
-	@OneToMany(mappedBy = "user")
-	private List<UserCoupon> userCoupons = new ArrayList<>();
+	/**
+	 * 단방향 연관관계 리팩토링
+	 */
+	// @OneToMany(mappedBy = "user")
+	// private List<UserCoupon> userCoupons = new ArrayList<>();
 
 	private String phone;
 
