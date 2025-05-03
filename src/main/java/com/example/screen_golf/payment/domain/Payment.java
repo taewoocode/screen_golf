@@ -6,8 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.reservation.domain.Reservation;
+import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -39,68 +38,63 @@ public class Payment {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@OneToOne
-	@JoinColumn(name = "reservation_id")
-	private Reservation reservation;
-
-	@ManyToOne
 	@JoinColumn(name = "user_coupon_id")
-	private UserCoupon userCoupon;
+	private Coupon coupon;
+
+	// @OneToOne
+	// @JoinColumn(name = "reservation_id")
+	// private Reservation reservation;
 
 	@Column(nullable = false)
 	private Integer amount;
+
+	@Column(nullable = false)
+	private String paymentMethod;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private PaymentStatus status;
 
-	@Column(name = "payment_method", nullable = false)
-	private String paymentMethod;
-
-	@Column(name = "transaction_id")
+	@Column
 	private String transactionId;
 
+	@Column
+	private String message;
+
 	@CreatedDate
-	@Column(name = "created_at", nullable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	@Column(nullable = false)
+	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Payment(User user, Reservation reservation, Integer amount,
-		PaymentStatus status, String paymentMethod, String transactionId) {
+	public Payment(User user, Integer amount, PaymentStatus status, Coupon coupon, String paymentMethod,
+		String transactionId, String message) {
 		this.user = user;
-		this.reservation = reservation;
 		this.amount = amount;
 		this.status = status;
+		this.coupon = coupon;
 		this.paymentMethod = paymentMethod;
 		this.transactionId = transactionId;
-		this.createdAt = LocalDateTime.now();
+		this.message = message;
 	}
 
-	public void updateStatus(PaymentStatus status, String transactionId) {
-		this.status = status;
-		this.transactionId = transactionId;
+	public void complete() {
+		this.status = PaymentStatus.COMPLETED;
 	}
 
-	/**
-	 * 정적 팩토리 메서드를 통해 Payment 객체를 생성합니다.
-	 * 초기 상태는 PENDING으로 설정됩니다.
-	 */
-	public static Payment createPayment(Long user, Reservation reservation, Integer amount, String paymentMethod,
-		UserCoupon userCoupon) {
-		Payment payment = new Payment();
-		payment.reservation = reservation;
-		payment.amount = amount;
-		payment.paymentMethod = paymentMethod;
-		payment.status = PaymentStatus.PENDING;
-		payment.userCoupon = userCoupon;
-		return payment;
+	public PaymentStatus fail() {
+		return PaymentStatus.FAILED;
+	}
+
+	public void refund() {
+		this.status = PaymentStatus.REFUNDED;
 	}
 
 	public void completePayment(String transactionId) {
@@ -108,11 +102,16 @@ public class Payment {
 		this.transactionId = transactionId;
 	}
 
-	public void failPayment() {
-		this.status = PaymentStatus.FAILED;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
-	public void refund() {
-		this.status = PaymentStatus.REFUNDED;
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
+
+	public void setStatus(PaymentStatus paymentStatus) {
+		this.status = paymentStatus;
+	}
+
 }
