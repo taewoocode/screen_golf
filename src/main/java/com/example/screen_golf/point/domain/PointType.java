@@ -1,4 +1,4 @@
-package com.example.screen_golf.point;
+package com.example.screen_golf.point.domain;
 
 public enum PointType {
 	CHARGE,   // 충전
