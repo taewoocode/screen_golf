@@ -1,4 +1,4 @@
-package com.example.screen_golf.point;
+package com.example.screen_golf.point.domain;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,15 +43,16 @@ public class Point {
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
+	@Builder
 	public Point(User user, Integer amount, PointType pointType, LocalDateTime createdAt) {
-		validateChargeUnit(amount);
 		this.user = user;
 		this.amount = amount;
 		this.type = pointType;
 		this.createdAt = createdAt;
+		validateChargeUnit(amount, pointType);
 	}
 
-	private void validateChargeUnit(Integer amount) {
+	private void validateChargeUnit(Integer amount, PointType pointType) {
 		if (type == PointType.CHARGE && amount % 5000 != 0) {
 			throw new IllegalArgumentException("포인트는 5,000원 단위로만 충전할 수 있습니다.");
 		}
