@@ -89,4 +89,10 @@ public class User {
 	public void changePassword(String newPassword) {
 		this.password = newPassword;
 	}
+
+	public void isValidPassword() {
+		if (password != null || password.length() < 8) {
+			throw new IllegalArgumentException("비밀번호는 최소 8자리 이상이여야 합니다.");
+		}
+	}
 }
