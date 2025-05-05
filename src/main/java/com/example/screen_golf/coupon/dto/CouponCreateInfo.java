@@ -3,7 +3,7 @@ package com.example.screen_golf.coupon.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class UserCouponCreateInfo {
+public class CouponCreateInfo {
 
 	@Getter
 	@NoArgsConstructor

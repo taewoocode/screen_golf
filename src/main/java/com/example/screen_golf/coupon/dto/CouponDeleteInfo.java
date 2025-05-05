@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class UserCouponDeleteInfo {
+public class CouponDeleteInfo {
 
 	/**
 	 * 사용자 쿠폰 삭제 요청 DTO

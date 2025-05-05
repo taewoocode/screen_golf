@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponStatus;
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
-import com.example.screen_golf.coupon.dto.UserCouponListInfo;
-import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
-import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
-import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.coupon.dto.CouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.CouponListInfo;
+import com.example.screen_golf.coupon.dto.CouponSearchCouponIdInfo;
+import com.example.screen_golf.coupon.dto.CouponSearchUserIdInfo;
+import com.example.screen_golf.coupon.repository.CouponRepository;
 import com.example.screen_golf.exception.coupon.CouponNotFoundException;
 import com.example.screen_golf.exception.user.UserNotFoundException;
 import com.example.screen_golf.user.domain.User;
@@ -25,9 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserCouponServiceImpl implements UserCouponService {
+public class CouponServiceImpl implements CouponService {
 
-	private final UserCouponRepository userCouponRepository;
+	private final CouponRepository userCouponRepository;
 	private final UserRepository userRepository;
 
 	/**
@@ -39,14 +39,14 @@ public class UserCouponServiceImpl implements UserCouponService {
 	 */
 	@Override
 	@Transactional
-	public UserCouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(Long userCouponId) {
+	public CouponDeleteInfo.UserCouponDeleteResponse deleteCoupon(Long userCouponId) {
 		if (!userCouponRepository.existsById(userCouponId)) {
 			throw new CouponNotFoundException("삭제할 쿠폰을 찾을 수 없습니다.");
 		}
 
 		userCouponRepository.deleteById(userCouponId);
 
-		return UserCouponDeleteInfo.UserCouponDeleteResponse.builder()
+		return CouponDeleteInfo.UserCouponDeleteResponse.builder()
 			.userCouponId(userCouponId)
 			.success(true)
 			.build();
@@ -60,11 +60,11 @@ public class UserCouponServiceImpl implements UserCouponService {
 	 * @return 쿠폰의 상세 정보를 담은 응답 객체
 	 */
 	@Override
-	public UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse findCoupon(Long userCouponId) {
-		UserCoupon userCoupon = userCouponRepository.findById(userCouponId)
+	public CouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse findCoupon(Long userCouponId) {
+		Coupon userCoupon = userCouponRepository.findById(userCouponId)
 			.orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
 
-		return UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse.builder()
+		return CouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse.builder()
 			.id(userCoupon.getId())
 			.userId(userCoupon.getUser().getId())
 			.couponCode(userCoupon.getCouponCode())
@@ -85,14 +85,14 @@ public class UserCouponServiceImpl implements UserCouponService {
 	 * @return 사용자의 쿠폰 정보를 담은 응답 객체
 	 */
 	@Override
-	public UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse findCouponInfoByUserId(Long userId) {
+	public CouponSearchUserIdInfo.UserCouponSearchCouponIdResponse findCouponInfoByUserId(Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
 
-		UserCoupon coupon = userCouponRepository.findByUser(user)
+		Coupon coupon = userCouponRepository.findByUser(user)
 			.orElseThrow(() -> new CouponNotFoundException("해당 쿠폰을 찾을 수 없습니다."));
 
-		return UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse.toDto(
+		return CouponSearchUserIdInfo.UserCouponSearchCouponIdResponse.toDto(
 			user, coupon, coupon.getPolicy());
 	}
 
@@ -105,17 +105,17 @@ public class UserCouponServiceImpl implements UserCouponService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<UserCouponListInfo.UserCouponListResponse> getUserCouponsByUserId(
-		UserCouponListInfo.UserCouponListRequest request) {
+	public List<CouponListInfo.UserCouponListResponse> getUserCouponsByUserId(
+		CouponListInfo.UserCouponListRequest request) {
 
-		List<UserCoupon> availableCoupons = userCouponRepository.findAvailableCoupons(
+		List<Coupon> availableCoupons = userCouponRepository.findAvailableCoupons(
 			request.getUserId(),
 			CouponStatus.UNUSED,
 			LocalDateTime.now()
 		);
 
 		return availableCoupons.stream()
-			.map(UserCouponListInfo.UserCouponListResponse::toDto)
+			.map(CouponListInfo.UserCouponListResponse::toDto)
 			.collect(Collectors.toList());
 	}
 }

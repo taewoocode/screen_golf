@@ -36,7 +36,7 @@ public class RoomPrice {
 	private Room room;
 
 	@Column(nullable = false)
-	private Integer price;  // 단일 가격
+	private Integer price;
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)

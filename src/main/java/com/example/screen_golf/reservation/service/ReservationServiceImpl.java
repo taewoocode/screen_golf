@@ -144,36 +144,7 @@ public class ReservationServiceImpl implements ReservationService {
 	public ReservationInfo.ReservationResponse checkPaymentStatus(Long reservationId) {
 		Reservation reservation = reservationRepository.findById(reservationId)
 			.orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
-
-		List<Payment> payments = paymentRepository.findByReservation(reservation);
-		Payment payment = payments.isEmpty() ? null : payments.get(0);
-
-		if (payment == null || payment.getStatus() != PaymentStatus.COMPLETED) {
-			return ReservationInfo.ReservationResponse.builder()
-				.reservationId(reservation.getId())
-				.roomId(reservation.getRoom().getId())
-				.roomName(reservation.getRoom().getName())
-				.startTime(reservation.getStartTime())
-				.endTime(reservation.getEndTime())
-				.status(ReservationStatus.PENDING)
-				.totalAmount(reservation.calculateTotalAmount())
-				.paymentRequired(true)
-				.message("결제가 필요합니다. 결제를 진행해주세요.")
-				.build();
-		}
-
-		// 결제가 완료된 경우
-		return ReservationInfo.ReservationResponse.builder()
-			.reservationId(reservation.getId())
-			.roomId(reservation.getRoom().getId())
-			.roomName(reservation.getRoom().getName())
-			.startTime(reservation.getStartTime())
-			.endTime(reservation.getEndTime())
-			.status(ReservationStatus.CONFIRMED)
-			.totalAmount(reservation.calculateTotalAmount())
-			.paymentRequired(false)
-			.message("예약이 완료되었습니다.")
-			.build();
+		return null;
 	}
 
 	private void validateTimeSlot(LocalDateTime startTime, LocalDateTime endTime) {

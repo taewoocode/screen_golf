@@ -1,15 +1,16 @@
-package com.example.screen_golf.payment.domain;
+package com.example.screen_golf.maintenance.domain;
 
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.example.screen_golf.room.domain.Room;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,40 +23,54 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "payment_histories")
+@Table(name = "room_maintenances")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class PaymentHistory {
+public class RoomMaintenance {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "payment_id", nullable = false)
-	private Payment payment;
+	@JoinColumn(name = "room_id", nullable = false)
+	private Room room;
 
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private PaymentStatus previousStatus;
+	private LocalDateTime startTime;
 
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private PaymentStatus newStatus;
+	private LocalDateTime endTime;
 
+	@Column(nullable = false)
 	private String reason;
+
+	private String description;
 
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	@LastModifiedDate
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
+
 	@Builder
-	public PaymentHistory(Payment payment, PaymentStatus previousStatus,
-		PaymentStatus newStatus, String reason) {
-		this.payment = payment;
-		this.previousStatus = previousStatus;
-		this.newStatus = newStatus;
+	public RoomMaintenance(Room room, LocalDateTime startTime, LocalDateTime endTime,
+		String reason, String description) {
+		this.room = room;
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.reason = reason;
+		this.description = description;
+	}
+
+	public void updateMaintenance(LocalDateTime startTime, LocalDateTime endTime,
+		String reason, String description) {
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.reason = reason;
+		this.description = description;
 	}
 } 

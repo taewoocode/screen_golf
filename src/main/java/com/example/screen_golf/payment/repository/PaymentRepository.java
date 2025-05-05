@@ -8,11 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
-import com.example.screen_golf.reservation.domain.Reservation;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    List<Payment> findByReservation(Reservation reservation);
-    List<Payment> findByStatus(PaymentStatus status);
-    Optional<Payment> findById(Long id);
+	List<Payment> findByStatus(PaymentStatus status);
+
+	Optional<Payment> findById(Long id);
 }

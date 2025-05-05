@@ -79,9 +79,10 @@ public class Payment {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Payment(User user, Integer amount, PaymentStatus status, Coupon coupon, String paymentMethod,
-		String transactionId, String message) {
+	public Payment(User user, RoomPrice roomPrice, Integer amount, PaymentStatus status, Coupon coupon,
+		String paymentMethod, String transactionId, String message) {
 		this.user = user;
+		this.roomPrice = roomPrice;
 		this.amount = amount;
 		this.status = status;
 		this.coupon = coupon;

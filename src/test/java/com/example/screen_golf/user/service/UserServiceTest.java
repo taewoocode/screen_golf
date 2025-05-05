@@ -198,5 +198,4 @@ public class UserServiceTest {
 		// when / then
 		assertThrows(IllegalArgumentException.class, () -> userService.login(loginRequest));  // 예외 발생
 	}
-
 }

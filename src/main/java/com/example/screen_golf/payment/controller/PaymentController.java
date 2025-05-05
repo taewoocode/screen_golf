@@ -35,14 +35,17 @@ public class PaymentController {
 		@RequestBody PaymentInfo.PaymentRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	) {
-		log.info("결제 요청 - 예약 ID: {}, 금액: {}, 결제 수단: {}", 
-			request.getReservationId(), request.getAmount(), request.getPaymentMethod());
-		
+		Long userId = userDetails.getUserId(); // 또는 request.getUserId() 유지할 수도 있음
+		log.info("결제 요청 시작 - 사용자 ID: {}, 방 ID: {}, 쿠폰 ID: {}",
+			userId, request.getCouponId());
+
+		// 필요시 request.setUserId(userId); 도 가능
 		PaymentInfo.PaymentResponse response = paymentService.requestPayment(request);
-		
-		log.info("결제 처리 완료 - 결제 ID: {}, 상태: {}", 
-			response.getPaymentId(), response.getStatus());
-		
+
+		log.info("결제 처리 완료 - 결제 ID: {}, 금액: {}, 상태: {}",
+			response.getPaymentId(), response.getAmount(), response.getStatus());
+
 		return ResponseEntity.ok(response);
 	}
+
 }

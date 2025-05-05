@@ -2,14 +2,14 @@ package com.example.screen_golf.coupon.dto;
 
 import java.time.LocalDateTime;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
+import com.example.screen_golf.coupon.domain.Coupon;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class UserCouponListInfo {
+public class CouponListInfo {
 
 	@Builder
 	@Getter
@@ -32,7 +32,7 @@ public class UserCouponListInfo {
 		private LocalDateTime validTo;
 		private String status;
 
-		public static UserCouponListResponse toDto(UserCoupon coupon) {
+		public static UserCouponListResponse toDto(Coupon coupon) {
 			return UserCouponListResponse.builder()
 				.id(coupon.getId())
 				.couponCode(coupon.getCouponCode())

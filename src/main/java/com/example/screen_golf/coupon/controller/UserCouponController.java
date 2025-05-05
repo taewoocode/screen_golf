@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.screen_golf.coupon.dto.UserCouponDeleteInfo;
-import com.example.screen_golf.coupon.dto.UserCouponListInfo;
-import com.example.screen_golf.coupon.dto.UserCouponSearchCouponIdInfo;
-import com.example.screen_golf.coupon.dto.UserCouponSearchUserIdInfo;
-import com.example.screen_golf.coupon.service.UserCouponService;
+import com.example.screen_golf.coupon.dto.CouponDeleteInfo;
+import com.example.screen_golf.coupon.dto.CouponListInfo;
+import com.example.screen_golf.coupon.dto.CouponSearchCouponIdInfo;
+import com.example.screen_golf.coupon.dto.CouponSearchUserIdInfo;
+import com.example.screen_golf.coupon.service.CouponService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Coupon", description = "Coupon 관련 API")
 public class UserCouponController {
 
-	private final UserCouponService userCouponService;
+	private final CouponService userCouponService;
 
 	// @Operation(
 	// 	summary = SwaggerDocs.SUMMARY_CREATE_USER_COUPON,
@@ -53,11 +53,11 @@ public class UserCouponController {
 		description = SwaggerDocs.DESCRIPTION_DELETE_USER_COUPON
 	)
 	@DeleteMapping("/{userCouponId}")
-	public ResponseEntity<UserCouponDeleteInfo.UserCouponDeleteResponse> deleteUserCoupon(
+	public ResponseEntity<CouponDeleteInfo.UserCouponDeleteResponse> deleteUserCoupon(
 		@Parameter(name = "userCouponId", description = "삭제할 쿠폰 Id", required = true)
 		@PathVariable("userCouponId") Long userCouponId
 	) {
-		UserCouponDeleteInfo.UserCouponDeleteResponse userCouponDeleteResponse
+		CouponDeleteInfo.UserCouponDeleteResponse userCouponDeleteResponse
 			= userCouponService.deleteCoupon(userCouponId);
 		log.info("쿠폰 삭제 성공 - 쿠폰 이름 = {}", userCouponDeleteResponse.getUserCouponId());
 		return ResponseEntity.ok(userCouponDeleteResponse);
@@ -68,11 +68,11 @@ public class UserCouponController {
 		description = SwaggerDocs.DESCRIPTION_USER_COUPON_INFO
 	)
 	@GetMapping("/{userCouponId}")
-	public ResponseEntity<UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse> findByCoupon(
+	public ResponseEntity<CouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse> findByCoupon(
 		@Parameter(description = "조회할 쿠폰 Id", required = true)
 		@PathVariable("userCouponId") Long userCouponId
 	) {
-		UserCouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse response =
+		CouponSearchCouponIdInfo.UserCouponSearchCouponIdResponse response =
 			userCouponService.findCoupon(userCouponId);
 		return ResponseEntity.ok(response);
 	}
@@ -87,11 +87,11 @@ public class UserCouponController {
 		description = SwaggerDocs.DESCRIPTION_USER_COUPON_INFO_FROM_USER_ID
 	)
 	@GetMapping("/users/{userId}")
-	public ResponseEntity<UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse> findByCouponInfoByUserId(
+	public ResponseEntity<CouponSearchUserIdInfo.UserCouponSearchCouponIdResponse> findByCouponInfoByUserId(
 		@Parameter(description = "조회할 유저 Id", required = true)
 		@PathVariable("userId") Long userId
 	) {
-		UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse couponInfoByUserId =
+		CouponSearchUserIdInfo.UserCouponSearchCouponIdResponse couponInfoByUserId =
 			userCouponService.findCouponInfoByUserId(userId);
 		return ResponseEntity.ok(couponInfoByUserId);
 	}
@@ -101,11 +101,11 @@ public class UserCouponController {
 		description = SwaggerDocs.DESCRIPTION_USER_COUPON_LIST_INFO_FROM_USER_ID
 	)
 	@PostMapping
-	public ResponseEntity<List<UserCouponListInfo.UserCouponListResponse>> getAvailableUserCouponListByUserId(
+	public ResponseEntity<List<CouponListInfo.UserCouponListResponse>> getAvailableUserCouponListByUserId(
 		@Parameter(description = "조회할 유저 Id", required = true)
-		@RequestBody UserCouponListInfo.UserCouponListRequest request
+		@RequestBody CouponListInfo.UserCouponListRequest request
 	) {
-		List<UserCouponListInfo.UserCouponListResponse> userCouponsByUserId
+		List<CouponListInfo.UserCouponListResponse> userCouponsByUserId
 			= userCouponService.getUserCouponsByUserId(request);
 		return ResponseEntity.ok(userCouponsByUserId);
 	}
