@@ -1,5 +1,6 @@
 package com.example.screen_golf.room.domain;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -180,5 +181,20 @@ public class Room {
 			case IN_USE -> newStatus == RoomStatus.AVAILABLE || newStatus == RoomStatus.MAINTENANCE;
 			case MAINTENANCE -> newStatus == RoomStatus.AVAILABLE;
 		};
+	}
+
+	/**
+	 * 가격 계산 (예약 날짜, 시작 시간, 종료 시간을 고려)
+	 * @param reservationDate 예약 날짜
+	 * @param startTime 예약 시작 시간
+	 * @param endTime 예약 종료 시간
+	 * @return 최종 가격
+	 */
+	public Integer calculatePrice(LocalDate reservationDate, LocalDateTime startTime, LocalDateTime endTime) {
+		int durationInHours = (int)Duration.between(startTime, endTime).toHours();  // 시간 차이 계산
+		int pricePerHour = roomType.getPricePerHour();  // 룸 타입에 따른 시간당 가격
+
+		// 가격 계산 (시간 * 시간당 가격)
+		return pricePerHour * durationInHours;
 	}
 }
