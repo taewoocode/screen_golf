@@ -12,9 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.coupon.dto.UserCouponListInfo;
-import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.coupon.domain.Coupon;
+import com.example.screen_golf.coupon.dto.CouponListInfo;
+import com.example.screen_golf.coupon.repository.CouponRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserRole;
 import com.example.screen_golf.user.domain.UserStatus;
@@ -26,10 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 class UserCouponServiceImplTest {
 
 	@Mock
-	private UserCouponRepository userCouponRepository;
+	private CouponRepository userCouponRepository;
 
 	@InjectMocks
-	private UserCouponServiceImpl userCouponService;
+	private CouponServiceImpl userCouponService;
 
 	@Test
 	@DisplayName("사용자가_쿠폰을_보유하고_있으면_쿠폰_목록을_반환해야_한다")
@@ -44,7 +44,7 @@ class UserCouponServiceImplTest {
 			.status(UserStatus.ACTIVE)
 			.build();
 
-		UserCoupon testCoupon1 = UserCoupon.builder()
+		Coupon testCoupon1 = Coupon.builder()
 			.couponCode("testCoupon1")
 			// .name("testCouponName1")
 			.validFrom(LocalDateTime.now())
@@ -52,7 +52,7 @@ class UserCouponServiceImplTest {
 			.user(testUser)  // Coupon의 user 필드 설정
 			.build();
 
-		UserCoupon testCoupon2 = UserCoupon.builder()
+		Coupon testCoupon2 = Coupon.builder()
 			.couponCode("testCoupon2")
 			// .name("testCouponName2")
 			.validFrom(LocalDateTime.now())
@@ -64,7 +64,7 @@ class UserCouponServiceImplTest {
 		testUser.getUserCoupons().add(testCoupon2);
 
 		// When
-		List<UserCoupon> userCoupons = testUser.getUserCoupons();
+		List<Coupon> userCoupons = testUser.getUserCoupons();
 
 		// Then
 		assertThat(userCoupons)
@@ -77,7 +77,7 @@ class UserCouponServiceImplTest {
 	@DisplayName("사용자의 사용 가능한 쿠폰 리스트를 반환한다.")
 	void 사용_가능한_쿠폰_리스트_반환() throws Exception {
 		Long userId = 1L;
-		UserCouponListInfo.UserCouponListRequest request = new UserCouponListInfo.UserCouponListRequest(userId);
+		CouponListInfo.UserCouponListRequest request = new CouponListInfo.UserCouponListRequest(userId);
 
 		LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
 		LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
