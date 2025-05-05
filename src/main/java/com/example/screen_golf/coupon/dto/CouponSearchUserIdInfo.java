@@ -2,9 +2,9 @@ package com.example.screen_golf.coupon.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponPolicy;
 import com.example.screen_golf.coupon.domain.CouponStatus;
-import com.example.screen_golf.coupon.domain.UserCoupon;
 import com.example.screen_golf.user.domain.User;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 /**
  * User의 ID로 쿠폰의 정보 확인
  */
-public class UserCouponSearchUserIdInfo {
+public class CouponSearchUserIdInfo {
 
 	@NoArgsConstructor
 	@AllArgsConstructor
@@ -33,8 +33,8 @@ public class UserCouponSearchUserIdInfo {
 		private LocalDateTime createdAt;
 		private LocalDateTime updatedAt;
 
-		public static UserCouponSearchCouponIdResponse toDto(User user, UserCoupon coupon, CouponPolicy policy) {
-			return UserCouponSearchUserIdInfo.UserCouponSearchCouponIdResponse.builder()
+		public static UserCouponSearchCouponIdResponse toDto(User user, Coupon coupon, CouponPolicy policy) {
+			return CouponSearchUserIdInfo.UserCouponSearchCouponIdResponse.builder()
 				.userId(user.getId())
 				.id(coupon.getId())
 				.couponCode(coupon.getCouponCode())

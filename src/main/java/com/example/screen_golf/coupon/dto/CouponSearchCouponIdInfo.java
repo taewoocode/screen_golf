@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * 쿠폰ID로 쿠폰의 정보를 조회한다.
  */
-public class UserCouponSearchCouponIdInfo {
+public class CouponSearchCouponIdInfo {
 
 	@NoArgsConstructor
 	@AllArgsConstructor
