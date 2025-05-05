@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.coupon.domain.Coupon;
+import com.example.screen_golf.coupon.repository.CouponRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
 
@@ -21,7 +21,7 @@ class CouponRandomServiceTest {
 	private CouponRandomService couponRandomService;
 
 	@Autowired
-	private UserCouponRepository userCouponRepository;
+	private CouponRepository userCouponRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -36,9 +36,9 @@ class CouponRandomServiceTest {
 		couponRandomService.issueMonthlyCouponToAllUsers();
 
 		// then
-		List<UserCoupon> coupons = userCouponRepository.findAll();
+		List<Coupon> coupons = userCouponRepository.findAll();
 		Assertions.assertThat(coupons).hasSize(2);
-		for (UserCoupon coupon : coupons) {
+		for (Coupon coupon : coupons) {
 			System.out.println("발급된 쿠폰: " + coupon.getCouponPolicy().name());
 		}
 	}

@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponPolicy;
-import com.example.screen_golf.coupon.domain.UserCoupon;
-import com.example.screen_golf.coupon.repository.UserCouponRepository;
+import com.example.screen_golf.coupon.repository.CouponRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserStatus;
 import com.example.screen_golf.user.repository.UserRepository;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CouponRandomService {
 
 	private final UserRepository userRepository;
-	private final UserCouponRepository userCouponRepository;
+	private final CouponRepository userCouponRepository;
 
 	private static final Random random = new Random();
 	private static final int COUPON_VALID_DAYS = 50;
@@ -45,7 +45,7 @@ public class CouponRandomService {
 			}
 
 			CouponPolicy randomPolicy = getRandomPolicy();
-			UserCoupon userCoupon = createUserCoupon(user, randomPolicy);
+			Coupon userCoupon = createUserCoupon(user, randomPolicy);
 			userCouponRepository.save(userCoupon);
 
 			log.info("쿠폰 발급 완료 - userId: {}, policy: {}", user.getId(), randomPolicy.name());
@@ -58,9 +58,9 @@ public class CouponRandomService {
 		return userCouponRepository.existsByUserAndCreatedAtBetween(user, startOfMonth, endOfMonth);
 	}
 
-	private UserCoupon createUserCoupon(User user, CouponPolicy policy) {
+	private Coupon createUserCoupon(User user, CouponPolicy policy) {
 		LocalDateTime now = LocalDateTime.now();
-		return UserCoupon.builder()
+		return Coupon.builder()
 			.user(user)
 			.couponCode(UUID.randomUUID().toString())
 			.couponPolicy(policy)
