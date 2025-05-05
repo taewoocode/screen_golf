@@ -63,6 +63,35 @@ class PointServiceTest {
 	}
 
 	@Test
+	@DisplayName("3000원을 충전하면 테스트 실패")
+	void testPointChargeFailed() {
+		// Given: 테스트용 사용자와 충전 금액 셋업
+		long userId = 1L;
+		int chargeAmount = 3000;
+		User testUser = new User("testUser", "testPassword", "taewoo", "0000-0000-0000",
+			UserRole.USER, UserStatus.ACTIVE, "testImage");
+		ReflectionTestUtils.setField(testUser, "id", userId);
+
+		// 사용자 repository가 해당 사용자를 반환하도록 세팅
+		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+		// pointRepository.save()는 아무런 작업 없이 진행
+		when(pointRepository.save(any())).thenAnswer(l -> l.getArgument(0));
+
+		// When: 포인트 충전 요청
+		PointChargeInfo.PointChargeResponse response = pointService.requestPointCharge(
+			PointChargeInfo.PointChargeRequest.builder()
+				.userId(userId)
+				.amount(chargeAmount)
+				.build());
+
+		assertThat(response).isNotNull();
+		assertThat(response.getUserId()).isEqualTo(userId);
+		assertThat(response.getChargedAmount()).isEqualTo(chargeAmount);
+		assertThat(response.getMessage()).isEqualTo("포인트 충전이 완료되었습니다.");
+		verify(pointRepository, times(1)).save(any());
+	}
+
+	@Test
 	@DisplayName("사용자 미존재시 포인트 충전 시 예외 발생")
 	void testPointChargeUserNotFound() {
 		// Given: 존재하지 않는 사용자 ID와 충전 금액
