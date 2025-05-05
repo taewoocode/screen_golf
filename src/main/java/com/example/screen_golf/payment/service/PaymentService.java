@@ -1,6 +1,7 @@
 package com.example.screen_golf.payment.service;
 
 import com.example.screen_golf.payment.dto.PaymentInfo;
+import com.example.screen_golf.reservation.domain.Reservation;
 
 public interface PaymentService {
 	/**
@@ -10,11 +11,5 @@ public interface PaymentService {
 	 */
 	PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest request);
 
-	/**
-	 * 결제 상태를 업데이트합니다.
-	 * @param paymentId 결제 ID
-	 * @param status 새로운 결제 상태
-	 * @param transactionId 거래 ID (선택사항)
-	 */
-	void updatePaymentStatus(Long paymentId, String status, String transactionId);
+	void approve(Reservation reservation);
 }
