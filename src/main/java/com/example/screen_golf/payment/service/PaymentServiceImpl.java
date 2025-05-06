@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponStatus;
 import com.example.screen_golf.coupon.repository.CouponRepository;
-import com.example.screen_golf.exception.payment.PaymentNotCompletedException;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentInfo;
+import com.example.screen_golf.payment.gateway.PaymentGateway;
 import com.example.screen_golf.payment.repository.PaymentRepository;
-import com.example.screen_golf.reservation.domain.Reservation;
-import com.example.screen_golf.room.domain.RoomPrice;
-import com.example.screen_golf.room.repository.RoomPriceRepository;
+import com.example.screen_golf.reservation.dto.ReservationInfo;
+import com.example.screen_golf.reservation.service.ReservationService;
+import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.repository.RoomRepository;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.repository.UserRepository;
@@ -33,7 +33,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final UserRepository userRepository;
 	private final CouponRepository couponRepository;
 	private final RoomRepository roomRepository;
-	private final RoomPriceRepository roomPriceRepository;
+	private final PaymentGateway paymentGateway;
+	private final ReservationService reservationService;
 
 	/**
 	 * // 결제 객체 생성 (상태는 PENDING) -> 예약 승인 후 결제 완료로 변경(approve)
@@ -43,32 +44,94 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional
 	public PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest request) {
-		// 사용자 조회
 		User user = userRepository.findById(request.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-		// 룸 가격정보 조회
-		RoomPrice roomPrice = roomPriceRepository.findByRoom(request.getRoomPriceId())
-			.orElseThrow(() -> new IllegalArgumentException("해당 가격 정보를 찾을 수 없습니다."));
+		Room room = roomRepository.findById(request.getLoomId())
+			.orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-		// 사용가능한 쿠폰정보 조회
+		Integer price = room.calculatePrice(request.getReservationDate(), request.getStartTime(), request.getEndTime());
+
 		List<Coupon> availableCoupons = couponRepository.findAvailableCoupons(user.getId(), CouponStatus.UNUSED,
 			LocalDateTime.now());
 
-		Integer price = roomPrice.getPrice();
+		// 쿠폰 적용
+		Integer finalAmount = applyCoupon(request, availableCoupons, price);
 
-		Coupon coupon = null;
-		Integer discountAmount = 0;
-		Integer finalAmount = price;
+		Payment payment = Payment.builder()
+			.user(user)
+			.room(room)
+			.amount(finalAmount)
+			.paymentMethod("KAKAOPAY")
+			.status(PaymentStatus.PENDING)
+			.message("결제가 진행 중입니다.")
+			.build();
 
-		// 쿠폰이 존재하고 유효한 쿠폰이 있다면 && 선택한 쿠폰이 유효한지 확인
+		Payment savedPayment = paymentRepository.save(payment);
+
+		return paymentGateway.requestPayment(savedPayment);
+	}
+
+	@Override
+	@Transactional
+	public PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
+		LocalDateTime startTime, LocalDateTime endTime) {
+		// 1. Payment 조회
+		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
+			.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
+
+		try {
+			// 2. 카카오페이 결제 승인
+			PaymentInfo.PaymentResponse response = paymentGateway.approvePayment(paymentKey, orderId, amount);
+
+			// 3. Payment 상태를 COMPLETED로 업데이트
+			payment.setStatus(PaymentStatus.COMPLETED);
+			payment.setMessage("결제가 완료되었습니다.");
+			paymentRepository.save(payment);
+
+			// 4. 예약 생성 (결제 후 예약을 생성)
+			ReservationInfo.ReservationRequest reservationRequest = new ReservationInfo.ReservationRequest(
+				payment.getUser().getId(),
+				payment.getRoom().getId(),
+				startTime,
+				endTime,
+				payment.getId()
+			);
+
+			reservationService.createReservation(reservationRequest);
+
+			return response;
+		} catch (Exception e) {
+			// 6. 결제 실패 시 상태 업데이트
+			payment.setStatus(PaymentStatus.FAILED);
+			payment.setMessage("결제가 실패했습니다: " + e.getMessage());
+			paymentRepository.save(payment);
+			throw e;
+		}
+	}
+
+	@Override
+	@Transactional
+	public PaymentInfo.PaymentResponse cancelPayment(String paymentKey, String cancelReason) {
+		return paymentGateway.cancelPayment(paymentKey, cancelReason);
+	}
+
+	private Integer calculateFinalAmount(Integer amount, Coupon coupon) {
+		if (coupon != null) {
+			return coupon.calculateDiscount(amount);
+		}
+		return amount;
+	}
+
+	// 쿠폰 적용 처리 로직
+	private Integer applyCoupon(PaymentInfo.PaymentRequest request, List<Coupon> availableCoupons, Integer price) {
 		if (request.getCouponId() != null) {
-
-			coupon = availableCoupons.stream()
+			Coupon coupon = availableCoupons.stream()
 				.filter(c -> c.getId().equals(request.getCouponId()))
 				.findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("유효한 쿠폰을 찾을 수 없습니다."));
 
+			// 쿠폰 유효성 체크
 			if (!coupon.isValid()) {
 				throw new IllegalArgumentException("유효하지 않은 쿠폰입니다.");
 			}
@@ -76,112 +139,15 @@ public class PaymentServiceImpl implements PaymentService {
 				throw new IllegalArgumentException("이미 사용된 쿠폰입니다.");
 			}
 
-			discountAmount = coupon.calculateDiscount(price);
-			finalAmount = price - discountAmount;
+			Integer discountAmount = coupon.calculateDiscount(price);
+			Integer finalAmount = price - discountAmount;
+
 			if (finalAmount < 0) {
 				finalAmount = 0;
 			}
+			return finalAmount;
 		}
 
-		// 결제 객체 생성 (상태는 PENDING)
-		Payment payment = Payment.builder()
-			.user(user)
-			.amount(finalAmount)
-			.paymentMethod("CARD")
-			.status(PaymentStatus.PENDING)
-			.coupon(coupon)  // coupon이 null일 수 있으므로
-			.message("결제가 진행 중입니다.")
-			.build();
-
-		// 결제 객체 저장 (최종 결제 승인 전에 상태는 PENDING)
-		Payment savedPayment = paymentRepository.save(payment);
-
-		return PaymentInfo.PaymentResponse.toDto(savedPayment, coupon);  // coupon이 null일 수 있음
+		return price;
 	}
-
-	@Override
-	@Transactional
-	public void approve(Reservation reservation) {
-		Payment payment = reservation.getPayment();
-
-		if (payment == null) {
-			throw new PaymentNotCompletedException("예약에 결제 정보가 없습니다.");
-		}
-
-		if (payment.getStatus() == PaymentStatus.COMPLETED) {
-			log.info("이미 결제가 완료된 상태입니다. 결제 ID={}", payment.getId());
-			return;
-		}
-
-		try {
-			// 결제 금액 계산 전에 쿠폰이 있으면 적용하여 할인 금액을 계산
-			Coupon coupon = payment.getCoupon();
-			if (coupon != null) {
-				int discountAmount = coupon.calculateDiscount(payment.getAmount());
-				payment = payment.builder()
-					.amount(payment.getAmount() - discountAmount)
-					.message("결제가 진행 중입니다. 쿠폰 적용: " + coupon.getCouponCode())
-					.build();
-
-				coupon.use();
-				couponRepository.save(coupon);
-				log.info("쿠폰 사용 완료: 쿠폰 ID={}", coupon.getId());
-			}
-
-			// 결제 처리
-			payment = payment.builder()
-				.status(PaymentStatus.COMPLETED)
-				.transactionId("TXN_" + System.currentTimeMillis())  // 트랜잭션 ID 갱신
-				.message("결제가 완료되었습니다.")
-				.build();
-			paymentRepository.save(payment);
-
-			log.info("결제 승인 완료: 결제 ID={}", payment.getId());
-
-		} catch (Exception e) {
-			payment = payment.builder()
-				.status(PaymentStatus.FAILED)
-				.message("결제 승인 실패: " + e.getMessage())
-				.build();
-			paymentRepository.save(payment);
-			log.error("결제 승인 중 오류 발생", e);
-			throw new PaymentNotCompletedException("결제 승인 중 오류가 발생했습니다.", e);
-		}
-	}
-
-	private void processPaymentApproval(Payment payment, Coupon coupon) {
-		try {
-			// 결제 승인 처리
-			log.info("결제 승인 처리 시작: 결제 ID={}, 사용자 ID={}", payment.getId(), payment.getUser().getId());
-
-			// 결제 완료 상태로 변경
-			Object success = PaymentStatus.COMPLETED;
-			payment.setMessage("결제가 완료되었습니다.");
-			payment.setTransactionId("TXN_" + System.currentTimeMillis());
-
-			paymentRepository.save(payment);
-
-			// 쿠폰 사용 처리 (쿠폰이 있으면)
-			if (coupon != null) {
-				coupon.use();
-				couponRepository.save(coupon);
-				log.info("쿠폰 사용 처리 완료: 쿠폰 ID={}", coupon.getId());
-			}
-		} catch (Exception e) {
-			log.error("결제 승인 처리 중 오류 발생: {}", e.getMessage(), e);
-			Object failed = PaymentStatus.FAILED;
-			payment.setMessage("결제 승인 실패: " + e.getMessage());
-			paymentRepository.save(payment);
-			throw new PaymentNotCompletedException("결제 승인 처리 중 오류가 발생했습니다.", e);
-		}
-	}
-
-	private void processPaymentFailure(Payment payment) {
-		// 결제 실패 처리
-		Object failed = PaymentStatus.FAILED;
-		payment.setMessage("결제가 실패했습니다.");
-		paymentRepository.save(payment);
-		log.error("결제 실패: 결제 ID={}", payment.getId());
-	}
-
 }
