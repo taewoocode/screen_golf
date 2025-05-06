@@ -12,7 +12,6 @@ import com.example.screen_golf.exception.reservation.ReservationNotAvailableExce
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.repository.PaymentRepository;
-import com.example.screen_golf.payment.service.PaymentService;
 import com.example.screen_golf.reservation.domain.Reservation;
 import com.example.screen_golf.reservation.domain.ReservationStatus;
 import com.example.screen_golf.reservation.dto.ReservationInfo;
@@ -36,7 +35,6 @@ public class ReservationServiceImpl implements ReservationService {
 	private final RoomRepository roomRepository;
 	private final UserRepository userRepository;
 	private final PaymentRepository paymentRepository;
-	private final PaymentService paymentService;
 
 	private static final LocalTime OPEN_TIME = LocalTime.of(9, 0);  // 오픈 시간: 09:00
 	private static final LocalTime CLOSE_TIME = LocalTime.of(22, 0); // 마감 시간: 22:00
@@ -44,46 +42,53 @@ public class ReservationServiceImpl implements ReservationService {
 	@Override
 	@Transactional
 	public ReservationInfo.ReservationResponse createReservation(ReservationInfo.ReservationRequest request) {
+		// 사용자 조회
 		User user = userRepository.findById(request.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+		// 방 조회
 		Room room = roomRepository.findById(request.getRoomId())
 			.orElseThrow(() -> new IllegalArgumentException("방을 찾을 수 없습니다."));
 
+		// 결제 정보 조회
 		Payment payment = null;
 		if (request.getPaymentId() != null) {
 			payment = paymentRepository.findById(request.getPaymentId())
 				.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
+			
+			// 결제 상태에 따른 예약 처리
+			if (payment.getStatus() == PaymentStatus.COMPLETED) {
+				// 결제 완료된 경우 예약 생성
+				Reservation reservation = Reservation.builder()
+					.user(user)
+					.room(room)
+					.startTime(request.getStartTime())
+					.endTime(request.getEndTime())
+					.status(ReservationStatus.CONFIRMED)
+					.payment(payment)
+					.build();
 
-			if (payment.getStatus() != PaymentStatus.COMPLETED) {
-				throw new IllegalArgumentException("결제가 완료되지 않았습니다.");
+				Reservation savedReservation = reservationRepository.save(reservation);
+				return ReservationInfo.ReservationResponse.toDto(savedReservation);
+			} else if (payment.getStatus() == PaymentStatus.FAILED) {
+				// 결제 실패한 경우 예약 취소
+				throw new ReservationNotAvailableException("결제가 실패했습니다. 예약을 취소합니다.");
+			} else {
+				// 결제 진행 중인 경우
+				throw new ReservationNotAvailableException("결제가 완료되지 않았습니다.");
 			}
-		}
-
-		// 결제 상태가 실패인 경우 예약을 취소
-		if (payment != null && payment.getStatus() == PaymentStatus.FAILED) {
-			throw new ReservationNotAvailableException("결제가 실패했습니다. 예약을 취소합니다.");
-		}
-
-		Reservation reservation = null;
-		if (payment != null && payment.getStatus() == PaymentStatus.COMPLETED) {
-			// 예약 생성
-			reservation = Reservation.builder()
+		} else {
+			// 결제 없이 예약 생성 (예: 관리자 예약)
+			Reservation reservation = Reservation.builder()
 				.user(user)
 				.room(room)
 				.startTime(request.getStartTime())
 				.endTime(request.getEndTime())
 				.status(ReservationStatus.CONFIRMED)
-				.payment(payment)
 				.build();
-
-			paymentService.approve(reservation);
 
 			Reservation savedReservation = reservationRepository.save(reservation);
 			return ReservationInfo.ReservationResponse.toDto(savedReservation);
-		} else {
-			// 결제 상태가 실패일 경우, 예약을 생성하지 않고 예외 처리
-			throw new ReservationNotAvailableException("결제 실패로 예약을 생성할 수 없습니다.");
 		}
 	}
 

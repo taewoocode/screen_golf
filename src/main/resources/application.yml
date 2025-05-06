@@ -44,3 +44,8 @@ jwt:
   secret: ${GOLF_JWT_SECRET}
   expiration: ${GOLF_JWT_EXPIRATION}
 
+kakaopay:
+  client-id: ${KAKAOPAY_CLIENT_ID}
+  client-secret: ${KAKAOPAY_CLIENT_SECRET}
+  secret-key: ${KAKAOPAY_SECRET_KEY}
+
