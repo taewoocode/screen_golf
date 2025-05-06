@@ -1,7 +1,10 @@
 package com.example.screen_golf.payment.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.screen_golf.payment.dto.PaymentInfo;
-import com.example.screen_golf.reservation.domain.Reservation;
 
 public interface PaymentService {
 	/**
@@ -11,5 +14,22 @@ public interface PaymentService {
 	 */
 	PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest request);
 
-	void approve(Reservation reservation);
+	/**
+	 * 결제 승인을 처리합니다.
+	 * @param paymentKey 결제 키
+	 * @param orderId 주문 ID
+	 * @param amount 결제 금액
+	 * @return 결제 처리 결과
+	 */
+	@Transactional
+	PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
+		LocalDateTime startTime, LocalDateTime endTime);
+
+	/**
+	 * 결제 취소를 처리합니다.
+	 * @param paymentKey 결제 키
+	 * @param cancelReason 취소 사유
+	 * @return 결제 처리 결과
+	 */
+	PaymentInfo.PaymentResponse cancelPayment(String paymentKey, String cancelReason);
 }

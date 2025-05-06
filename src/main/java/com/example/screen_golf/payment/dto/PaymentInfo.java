@@ -1,5 +1,6 @@
 package com.example.screen_golf.payment.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.example.screen_golf.coupon.domain.Coupon;
@@ -29,7 +30,8 @@ public class PaymentInfo {
 		private Long couponId;
 
 		// RoomPrice ID (가격 정보에 대한 참조)
-		private Long roomPriceId;
+		private Long loomId;
+		private LocalDate reservationDate;
 		private LocalDateTime startTime;
 		private LocalDateTime endTime;
 	}
@@ -65,6 +67,9 @@ public class PaymentInfo {
 		private Integer discountAmount;  // 할인 금액
 		private Long couponId;           // 사용된 쿠폰 ID
 		private String message;          // 응답 메시지
+		private String redirectUrl;
+		private String paymentKey;       // 카카오페이 결제 키
+		private String orderId;          // 주문 ID
 
 		public static PaymentResponse toDto(Payment payment, Coupon userCoupon) {
 			return PaymentResponse.builder()
@@ -80,6 +85,8 @@ public class PaymentInfo {
 					userCoupon != null ? userCoupon.getCouponPolicy().calculateDiscount(payment.getAmount()) : 0)
 				.couponId(userCoupon != null ? userCoupon.getId() : null)
 				.message(payment.getMessage())
+				.paymentKey(payment.getPaymentKey())
+				.orderId(payment.getTransactionId())
 				.build();
 		}
 	}
