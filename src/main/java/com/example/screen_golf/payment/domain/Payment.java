@@ -1,13 +1,14 @@
 package com.example.screen_golf.payment.domain;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.screen_golf.coupon.domain.Coupon;
-import com.example.screen_golf.room.domain.RoomPrice;
+import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -43,16 +44,12 @@ public class Payment {
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "room_price_id", nullable = false)
-	private RoomPrice roomPrice;
+	@JoinColumn(name = "room_id", nullable = false)
+	private Room room;
 
 	@OneToOne
 	@JoinColumn(name = "user_coupon_id")
 	private Coupon coupon;
-
-	// @OneToOne
-	// @JoinColumn(name = "reservation_id")
-	// private Reservation reservation;
 
 	@Column(nullable = false)
 	private Integer amount;
@@ -60,12 +57,15 @@ public class Payment {
 	@Column(nullable = false)
 	private String paymentMethod;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private PaymentStatus status;
+	@Column
+	private String paymentKey;
 
 	@Column
 	private String transactionId;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private PaymentStatus status;
 
 	@Column
 	private String message;
@@ -79,10 +79,10 @@ public class Payment {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public Payment(User user, RoomPrice roomPrice, Integer amount, PaymentStatus status, Coupon coupon,
+	public Payment(User user, Room room, Integer amount, PaymentStatus status, Coupon coupon,
 		String paymentMethod, String transactionId, String message) {
 		this.user = user;
-		this.roomPrice = roomPrice;
+		this.room = room;
 		this.amount = amount;
 		this.status = status;
 		this.coupon = coupon;
