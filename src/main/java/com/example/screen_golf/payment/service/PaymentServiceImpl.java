@@ -52,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 		Integer price = room.calculatePrice(request.getReservationDate(), request.getStartTime(), request.getEndTime());
 
+		// 사용하지 않은 쿠폰 조회
 		List<Coupon> availableCoupons = couponRepository.findAvailableCoupons(user.getId(), CouponStatus.UNUSED,
 			LocalDateTime.now());
 
@@ -76,20 +77,19 @@ public class PaymentServiceImpl implements PaymentService {
 	@Transactional
 	public PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
 		LocalDateTime startTime, LocalDateTime endTime) {
-		// 1. Payment 조회
 		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
 			.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
 
 		try {
-			// 2. 카카오페이 결제 승인
 			PaymentInfo.PaymentResponse response = paymentGateway.approvePayment(paymentKey, orderId, amount);
 
-			// 3. Payment 상태를 COMPLETED로 업데이트
 			payment.setStatus(PaymentStatus.COMPLETED);
 			payment.setMessage("결제가 완료되었습니다.");
 			paymentRepository.save(payment);
 
-			// 4. 예약 생성 (결제 후 예약을 생성)
+			/**
+			 * 예약 요청 DTO 생성 후 정보를 ReservationService에게 전달
+			 */
 			ReservationInfo.ReservationRequest reservationRequest = new ReservationInfo.ReservationRequest(
 				payment.getUser().getId(),
 				payment.getRoom().getId(),
@@ -97,12 +97,10 @@ public class PaymentServiceImpl implements PaymentService {
 				endTime,
 				payment.getId()
 			);
-
 			reservationService.createReservation(reservationRequest);
 
 			return response;
 		} catch (Exception e) {
-			// 6. 결제 실패 시 상태 업데이트
 			payment.setStatus(PaymentStatus.FAILED);
 			payment.setMessage("결제가 실패했습니다: " + e.getMessage());
 			paymentRepository.save(payment);
@@ -123,7 +121,6 @@ public class PaymentServiceImpl implements PaymentService {
 		return amount;
 	}
 
-	// 쿠폰 적용 처리 로직
 	private Integer applyCoupon(PaymentInfo.PaymentRequest request, List<Coupon> availableCoupons, Integer price) {
 		if (request.getCouponId() != null) {
 			Coupon coupon = availableCoupons.stream()
