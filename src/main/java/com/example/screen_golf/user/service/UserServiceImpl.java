@@ -4,7 +4,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.screen_golf.common.redis.RedisUtil;
 import com.example.screen_golf.jwts.JwtProvider;
 import com.example.screen_golf.user.domain.User;
 import com.example.screen_golf.user.domain.UserRole;
@@ -14,6 +13,7 @@ import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
 import com.example.screen_golf.user.dto.UserSignUpInfo;
 import com.example.screen_golf.user.repository.UserRepository;
+import com.example.screen_golf.utils.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,22 +157,22 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String generateToken = jwtProvider.generateToken(user.getId());
-		
+
 		// 로그인 상태를 Redis에 저장
 		String loginKey = LOGIN_STATUS_PREFIX + user.getId();
 		redisUtil.setDataExpire(loginKey, "ACTIVE", LOGIN_STATUS_EXPIRATION);
-		
+
 		log.info("User {} logged in successfully", user.getId());
 		return new UserLoginInfo.UserLoginResponse((user.getId()), user.getEmail(), generateToken);
 	}
 
-	// 로그인 상태 확인 메서드 추가
+	@Override
 	public boolean isUserLoggedIn(Long userId) {
 		String loginKey = LOGIN_STATUS_PREFIX + userId;
 		return redisUtil.hasKey(loginKey);
 	}
 
-	// 로그아웃 메서드 추가
+	@Override
 	public void logout(Long userId) {
 		String loginKey = LOGIN_STATUS_PREFIX + userId;
 		redisUtil.deleteData(loginKey);
