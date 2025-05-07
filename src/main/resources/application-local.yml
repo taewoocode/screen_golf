@@ -43,3 +43,7 @@ springdoc:
 jwt:
   secret: ${GOLF_JWT_SECRET:default-secret-key}
   expiration: ${GOLF_JWT_EXPIRATION:86400000}
+
+logging:
+  discord:
+    webhook-uri: ${DISCORD_WEBHOOK_URI}
