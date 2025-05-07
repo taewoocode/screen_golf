@@ -13,6 +13,7 @@ import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
 import com.example.screen_golf.user.dto.UserSignUpInfo;
 import com.example.screen_golf.user.repository.UserRepository;
+import com.example.screen_golf.utils.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,10 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtProvider jwtProvider;
+	private final RedisUtil redisUtil;
+
+	private static final String LOGIN_STATUS_PREFIX = "login:status:";
+	private static final long LOGIN_STATUS_EXPIRATION = 24 * 60 * 60 * 1000; // 24시간
 
 	/**
 	 * 회원가입
@@ -152,6 +157,25 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String generateToken = jwtProvider.generateToken(user.getId());
+
+		// 로그인 상태를 Redis에 저장
+		String loginKey = LOGIN_STATUS_PREFIX + user.getId();
+		redisUtil.setDataExpire(loginKey, "ACTIVE", LOGIN_STATUS_EXPIRATION);
+
+		log.info("User {} logged in successfully", user.getId());
 		return new UserLoginInfo.UserLoginResponse((user.getId()), user.getEmail(), generateToken);
+	}
+
+	@Override
+	public boolean isUserLoggedIn(Long userId) {
+		String loginKey = LOGIN_STATUS_PREFIX + userId;
+		return redisUtil.hasKey(loginKey);
+	}
+
+	@Override
+	public void logout(Long userId) {
+		String loginKey = LOGIN_STATUS_PREFIX + userId;
+		redisUtil.deleteData(loginKey);
+		log.info("User {} logged out", userId);
 	}
 }

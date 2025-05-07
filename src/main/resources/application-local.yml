@@ -22,7 +22,11 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
-
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json

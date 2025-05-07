@@ -35,4 +35,17 @@ public interface UserService {
 	 */
 	UserLoginInfo.UserLoginResponse login(UserLoginInfo.UserLoginRequest request);
 
+	/**
+	 * 사용자의 로그인 상태 확인
+	 * @param userId
+	 * @return
+	 */
+	boolean isUserLoggedIn(Long userId);
+
+	/**
+	 * 사용자 로그아웃
+	 * @param userId
+	 */
+	void logout(Long userId);
+
 }
