@@ -23,6 +23,11 @@ spring:
         jdbc:
           time_zone: UTC
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
 logging:
   file:
     name: logs/application.log
