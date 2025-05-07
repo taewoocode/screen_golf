@@ -1,4 +1,4 @@
-package com.example.screen_golf.payment.gateway;
+package com.example.screen_golf.gateway;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -6,15 +6,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.screen_golf.gateway.dto.KakaoPayApproveRequest;
+import com.example.screen_golf.gateway.dto.KakaoPayApproveResponse;
+import com.example.screen_golf.gateway.dto.KakaoPayCancelRequest;
+import com.example.screen_golf.gateway.dto.KakaoPayCancelResponse;
+import com.example.screen_golf.gateway.dto.KakaoPayReadyRequest;
+import com.example.screen_golf.gateway.dto.KakaoPayReadyResponse;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentInfo;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayApproveRequest;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayApproveResponse;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayCancelRequest;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayCancelResponse;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayReadyRequest;
-import com.example.screen_golf.payment.gateway.dto.KakaoPayReadyResponse;
 import com.example.screen_golf.payment.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;

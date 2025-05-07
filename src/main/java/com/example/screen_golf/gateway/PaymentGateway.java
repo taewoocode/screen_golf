@@ -1,4 +1,4 @@
-package com.example.screen_golf.payment.gateway;
+package com.example.screen_golf.gateway;
 
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.dto.PaymentInfo;

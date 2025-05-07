@@ -9,10 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.screen_golf.coupon.domain.Coupon;
 import com.example.screen_golf.coupon.domain.CouponStatus;
 import com.example.screen_golf.coupon.repository.CouponRepository;
+import com.example.screen_golf.gateway.PaymentGateway;
+import com.example.screen_golf.notification.service.DiscordNotificationService;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentInfo;
-import com.example.screen_golf.payment.gateway.PaymentGateway;
 import com.example.screen_golf.payment.repository.PaymentRepository;
 import com.example.screen_golf.reservation.dto.ReservationInfo;
 import com.example.screen_golf.reservation.service.ReservationService;
@@ -35,6 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final RoomRepository roomRepository;
 	private final PaymentGateway paymentGateway;
 	private final ReservationService reservationService;
+	private final DiscordNotificationService discordNotificationService;
 
 	/**
 	 * // 결제 객체 생성 (상태는 PENDING) -> 예약 승인 후 결제 완료로 변경(approve)
@@ -98,6 +100,18 @@ public class PaymentServiceImpl implements PaymentService {
 				payment.getId()
 			);
 			reservationService.createReservation(reservationRequest);
+
+			// Discord 알림 전송
+			String notificationMessage = String.format(
+				"💰 결제 완료\n" +
+					"주문번호: %s\n" +
+					"금액: %d원\n" +
+					"결제자: %s",
+				orderId,
+				amount,
+				payment.getUser().getName()
+			);
+			discordNotificationService.sendPaymentNotification(notificationMessage);
 
 			return response;
 		} catch (Exception e) {

@@ -78,7 +78,6 @@ public class PaymentInfo {
 				.amount(payment.getAmount())
 				.paymentMethod(payment.getPaymentMethod())
 				.status(payment.getStatus())
-				.transactionId(payment.getTransactionId())
 				.createdAt(payment.getCreatedAt())
 				.couponPolicy(userCoupon != null ? userCoupon.getCouponPolicy() : null)
 				.discountAmount(
@@ -86,7 +85,6 @@ public class PaymentInfo {
 				.couponId(userCoupon != null ? userCoupon.getId() : null)
 				.message(payment.getMessage())
 				.paymentKey(payment.getPaymentKey())
-				.orderId(payment.getTransactionId())
 				.build();
 		}
 	}

@@ -23,6 +23,17 @@ spring:
         jdbc:
           time_zone: UTC
 
+logging:
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  discord:
+    webhook-uri: ${DISCORD_WEBHOOK_URI}
+
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
