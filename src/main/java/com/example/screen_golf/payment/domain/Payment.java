@@ -1,7 +1,6 @@
 package com.example.screen_golf.payment.domain;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -60,9 +59,6 @@ public class Payment {
 	@Column
 	private String paymentKey;
 
-	@Column
-	private String transactionId;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private PaymentStatus status;
@@ -80,14 +76,13 @@ public class Payment {
 
 	@Builder
 	public Payment(User user, Room room, Integer amount, PaymentStatus status, Coupon coupon,
-		String paymentMethod, String transactionId, String message) {
+		String paymentMethod, String message) {
 		this.user = user;
 		this.room = room;
 		this.amount = amount;
 		this.status = status;
 		this.coupon = coupon;
 		this.paymentMethod = paymentMethod;
-		this.transactionId = transactionId;
 		this.message = message;
 	}
 
@@ -100,20 +95,16 @@ public class Payment {
 	}
 
 	public void refund() {
-		this.status = PaymentStatus.REFUNDED;
+		this.status = PaymentStatus.CANCELED;
 	}
 
-	public void completePayment(String transactionId) {
+	public void completePayment(String paymentKey) {
 		this.status = PaymentStatus.COMPLETED;
-		this.transactionId = transactionId;
+		this.paymentKey = paymentKey;
 	}
 
 	public void setMessage(String message) {
 		this.message = message;
-	}
-
-	public void setTransactionId(String transactionId) {
-		this.transactionId = transactionId;
 	}
 
 	public void setStatus(PaymentStatus paymentStatus) {
