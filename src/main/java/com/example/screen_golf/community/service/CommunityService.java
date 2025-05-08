@@ -15,4 +15,8 @@ public interface CommunityService {
 	@Transactional(readOnly = true)
 	List<CommunitySearchListInfo.CommunitySearchListResponse> findCommunityList(
 		CommunitySearchListInfo.CommunitySearchListRequest request);
+
+	// 삭제 메서드 추가
+	@Transactional
+	void deletePost(Long id);
 }

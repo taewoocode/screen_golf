@@ -55,6 +55,28 @@ public class CommunityServiceImpl implements CommunityService {
 	}
 
 	/**
+	 * 게시글 삭제 추가
+	 * @param id
+	 */
+	@Override
+	@Transactional
+	public void deletePost(Long id) {
+		try {
+			// 해당 Community 객체가 존재하는지 확인
+			if (communityRepository.existsById(id)) {
+				// Community 객체 삭제
+				communityRepository.deleteById(id);
+				log.info("게시글이 삭제되었습니다={}", id);  // 한글로 변경
+			} else {
+				log.warn("게시글을 찾을 수 없습니다={}", id);  // 한글로 변경
+			}
+		} catch (Exception e) {
+			log.error("게시글 삭제 중 오류 발생={}", e.getMessage());  // 한글로 변경
+			throw new RuntimeException("게시글 삭제 실패.");
+		}
+	}
+
+	/**
 	 * 댓글 수 조회
 	 * @param community
 	 * @return
