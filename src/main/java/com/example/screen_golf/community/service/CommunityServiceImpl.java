@@ -3,10 +3,14 @@ package com.example.screen_golf.community.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.community.domain.Community;
+import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunityConverter;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
@@ -92,5 +96,45 @@ public class CommunityServiceImpl implements CommunityService {
 	 */
 	private int getCommentCountForCommunity(Community community) {
 		return communityRepository.countByParentReplyNumber(community.getPostNumber());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CommunityAdvancedInfo.CommunityAdvancedSearchResponse advancedSearch(
+		CommunityAdvancedInfo.CommunityAdvancedSearchRequest request) {
+
+		Sort sort = Sort.by(
+			Sort.Direction.fromString(request.getSortDirection()),
+			request.getSortBy()
+		);
+		Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
+
+		List<Community> communities = communityElasticSearchRepository.findByKeywordAndPostType(
+			request.getKeyword(),
+			request.getPostType().name()
+		);
+
+		if (request.getStartDate() != null && request.getEndDate() != null) {
+			communities = communities.stream()
+				.filter(community ->
+					!community.getCreatedAt().isBefore(request.getStartDate()) &&
+						!community.getCreatedAt().isAfter(request.getEndDate()))
+				.collect(Collectors.toList());
+		}
+
+		int start = (int)pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), communities.size());
+		List<Community> pagedCommunities = communities.subList(start, end);
+
+		List<CommunityAdvancedInfo.CommunityAdvancedSearchResponse.CommunityItem> responses = pagedCommunities.stream()
+			.map(community -> {
+				int commentCount = communityRepository.countByParentReplyNumber(community.getPostNumber());
+				return CommunityConverter.toAdvancedSearchResponse(community, commentCount);
+			})
+			.collect(Collectors.toList());
+		CommunityConverter.PagingInfo pagingInfo = CommunityConverter.createPagingInfo(
+			start, end, communities.size(), request.getSize(), request.getPage());
+
+		return CommunityConverter.toMakeAdvancedResponse(responses, pagingInfo);
 	}
 }
