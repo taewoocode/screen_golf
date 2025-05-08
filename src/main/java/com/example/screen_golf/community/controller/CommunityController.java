@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
+import com.example.screen_golf.community.dto.CommunityUpdateInfo;
 import com.example.screen_golf.community.service.CommunityService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
@@ -39,5 +40,22 @@ public class CommunityController {
 		log.info("게시글 작성 요청: {}", request);
 		CommunitySaveInfo.CommunitySaveResponse response = communityService.savePost(request);
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * 게시글 수정
+	 * @param request
+	 * @return
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_UPDATE_COMMUNITY,
+		description = SwaggerDocs.DESCRIPTION_UPDATE_COMMUNITY
+	)
+	public ResponseEntity<CommunityUpdateInfo.CommunityUpdateResponse> updatePost(
+		@RequestBody CommunityUpdateInfo.CommunityUpdateRequest request
+	) {
+		CommunityUpdateInfo.CommunityUpdateResponse communityUpdateResponse =
+			communityService.updatePost(request);
+		return ResponseEntity.ok(communityUpdateResponse);
 	}
 }
