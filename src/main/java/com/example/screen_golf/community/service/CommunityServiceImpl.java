@@ -10,8 +10,10 @@ import com.example.screen_golf.community.domain.Community;
 import com.example.screen_golf.community.dto.CommunityConverter;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
+import com.example.screen_golf.community.dto.CommunityUpdateInfo;
 import com.example.screen_golf.community.repository.elasticsearch.CommunityElasticSearchRepository;
 import com.example.screen_golf.community.repository.jpa.CommunityRepository;
+import com.example.screen_golf.exception.community.CommunityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,35 @@ public class CommunityServiceImpl implements CommunityService {
 				return CommunityConverter.toCommunitySearchListResponse(community, commentCount);
 			})
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 게시글 삭제 추가
+	 * @param id
+	 */
+	@Override
+	@Transactional
+	public void deletePost(Long id) {
+		try {
+			if (communityRepository.existsById(id)) {
+				communityRepository.deleteById(id);
+				log.info("게시글이 삭제되었습니다={}", id);  // 한글로 변경
+			} else {
+				log.warn("게시글을 찾을 수 없습니다={}", id);  // 한글로 변경
+			}
+		} catch (Exception e) {
+			log.error("게시글 삭제 중 오류 발생={}", e.getMessage());  // 한글로 변경
+			throw new RuntimeException("게시글 삭제 실패.");
+		}
+	}
+
+	@Override
+	@Transactional
+	public CommunityUpdateInfo.CommunityUpdateResponse updatePost(CommunityUpdateInfo.CommunityUpdateRequest request) {
+		Community community = communityRepository.findById(request.getId())
+			.orElseThrow(() -> new CommunityNotFoundException("해당 게시글을 찾을 수 없습니다."));
+		community.update(request.getTitle(), request.getContent());
+		return CommunityConverter.toUpdateResponse(community);
 	}
 
 	/**

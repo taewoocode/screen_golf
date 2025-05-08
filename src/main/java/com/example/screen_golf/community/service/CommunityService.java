@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
+import com.example.screen_golf.community.dto.CommunityUpdateInfo;
 
 public interface CommunityService {
 
@@ -15,4 +16,14 @@ public interface CommunityService {
 	@Transactional(readOnly = true)
 	List<CommunitySearchListInfo.CommunitySearchListResponse> findCommunityList(
 		CommunitySearchListInfo.CommunitySearchListRequest request);
+
+	// 삭제 메서드 추가
+	@Transactional
+	void deletePost(Long id);
+
+	/**
+	 * Update -> 게시글 id, 제목, 내용을 수정
+	 */
+	@Transactional
+	CommunityUpdateInfo.CommunityUpdateResponse updatePost(CommunityUpdateInfo.CommunityUpdateRequest request);
 }
