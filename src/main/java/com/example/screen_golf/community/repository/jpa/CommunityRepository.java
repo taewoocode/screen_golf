@@ -7,4 +7,5 @@ import com.example.screen_golf.community.domain.Community;
 
 @Repository
 public interface CommunityRepository extends JpaRepository<Community, Long> {
+	int countByParentReplyNumber(Integer postNumber);
 }
