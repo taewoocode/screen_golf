@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.example.screen_golf.exception.community.CommunityNotFoundException;
 import com.example.screen_golf.exception.coupon.CouponNotFoundException;
 import com.example.screen_golf.exception.payment.PaymentNotCompletedException;
 import com.example.screen_golf.exception.reservation.ReservationConflictException;
@@ -162,6 +163,18 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(PaymentNotCompletedException.class)
 	public ResponseEntity<String> handleCouponNotFoundException(PaymentNotCompletedException e) {
+		log.error("결제 오류: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+	}
+
+	/**=========================================================================
+	 *                           Community 관련
+	 * =========================================================================
+	 */
+
+	@ExceptionHandler(PaymentNotCompletedException.class)
+	public ResponseEntity<String> handleCommunityNotFoundException(CommunityNotFoundException e) {
 		log.error("결제 오류: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 
