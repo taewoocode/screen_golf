@@ -1,68 +1,102 @@
 package com.example.screen_golf.jwts;
 
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
-	private final Key key;
-	private final long expiration;
+	@Value("${jwt.secret}")
+	private String secretKey;
 
-	public JwtProvider(@Value("${GOLF_JWT_SECRET}") String secretKey,
-		@Value("${GOLF_JWT_EXPIRATION}") long expiration) {
-		this.key = secretKey.length() >= 256 ? Keys.hmacShaKeyFor(secretKey.getBytes())
-			: Keys.secretKeyFor(SignatureAlgorithm.HS256);
-		this.expiration = expiration;
+	@Value("${jwt.expiration}")
+	private long accessTokenExpiration;
+
+	@Value("${jwt.refresh-expiration}")
+	private long refreshTokenExpiration;
+
+	private SecretKey secretKeyInstance;
+
+	@PostConstruct
+	protected void init() {
+		byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+		// 비밀 키가 32바이트(256비트)보다 짧으면 SHA-256 해시를 사용하여 길이를 맞춥니다.
+		if (keyBytes.length < 32) {
+			try {
+				MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+				keyBytes = sha256.digest(keyBytes);
+				log.warn("주입받은 비밀 키가 32바이트보다 짧아 SHA-256 해시를 사용해 변환");
+			} catch (NoSuchAlgorithmException e) {
+				log.error("SHA-256 알고리즘을 사용할 수 없습니다.", e);
+				throw new RuntimeException("SHA-256 알고리즘을 사용할 수 없습니다.", e);
+			}
+		}
+		secretKeyInstance = Keys.hmacShaKeyFor(keyBytes);
 	}
 
-	/**
-	 * GenerationToken
-	 * @param userId
-	 * @return
-	 */
 	public String generateToken(Long userId) {
 		Date now = new Date();
-		Date expirationDate = new Date(now.getTime() + expiration);
+		Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
 		return Jwts.builder()
-			.setSubject(userId.toString())
+			.setSubject(String.valueOf(userId))
 			.setIssuedAt(now)
-			.setExpiration(expirationDate)
-			.signWith(key, SignatureAlgorithm.HS256)
+			.setExpiration(expiryDate)
+			.signWith(secretKeyInstance)
 			.compact();
 	}
 
-	// 토큰에서 사용자 ID 추출
+	public String generateRefreshToken(Long userId) {
+		Date now = new Date();
+		Date expiryDate = new Date(now.getTime() + refreshTokenExpiration);
+
+		return Jwts.builder()
+			.setSubject(String.valueOf(userId))
+			.setIssuedAt(now)
+			.setExpiration(expiryDate)
+			.signWith(secretKeyInstance)
+			.compact();
+	}
+
 	public Long getUserIdFromToken(String token) {
-		Claims claims = Jwts.parserBuilder()
-			.setSigningKey(key)
-			.build()
+		Claims claims = Jwts.parser()
+			.setSigningKey(secretKeyInstance)
 			.parseClaimsJws(token)
 			.getBody();
 
 		return Long.parseLong(claims.getSubject());
 	}
 
-	// 토큰 유효성 검증
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parserBuilder()
-				.setSigningKey(key)
-				.build()
+			Jwts.parser().setSigningKey(secretKeyInstance)
 				.parseClaimsJws(token);
 			return true;
-		} catch (JwtException | IllegalArgumentException e) {
+		} catch (Exception e) {
+			log.error("JWT 검증 오류: {}", e.getMessage());
 			return false;
 		}
+	}
+
+	public long getAccessTokenExpiration() {
+		return accessTokenExpiration;
+	}
+
+	public long getRefreshTokenExpiration() {
+		return refreshTokenExpiration;
 	}
 }
