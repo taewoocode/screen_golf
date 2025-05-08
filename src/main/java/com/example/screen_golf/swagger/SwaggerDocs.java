@@ -99,4 +99,12 @@ public class SwaggerDocs {
 	public static final String SUMMARY_REQUEST_PAYMENT = "결제 요청";
 	public static final String DESCRIPTION_REQUEST_PAYMENT =
 		"예약 ID, 사용자 ID, 결제 금액, 결제 수단 정보를 입력받아 결제 요청을 진행합니다.";
+
+	/**===================================================================
+	 *                   Community 관련
+	 * ===================================================================
+	 */
+	public static final String SUMMARY_REQUEST_COMMUNITY = "게시글 작성 요청";
+	public static final String DESCRIPTION_REQUEST_COMMUNITY =
+		"게시글 작성 요청을 진행합니다.";
 }
