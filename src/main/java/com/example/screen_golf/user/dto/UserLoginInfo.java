@@ -23,7 +23,8 @@ public class UserLoginInfo {
 	public static class UserLoginResponse {
 		private Long userId;
 		private String email;
-		private String token;
+		private String accessToken;
+		private String refreshToken;
 	}
 
 }
