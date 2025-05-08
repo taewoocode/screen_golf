@@ -12,11 +12,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "community")
+@Table(name = "board")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -74,4 +75,23 @@ public class Community {
 	/** 사용자 아이디 */
 	@Column(nullable = false)
 	private Long userId;
+
+	@Builder
+	public Community(Integer postNo, String postTil, String postCnts, PostType postDvCd, Integer rplNo,
+		Integer rplUpprNo, String tagUserId, String rplCnts, String atcfYn,
+		String stopYn, String stopDvCd, Long userId) {
+		this.postNo = postNo;
+		this.postTil = postTil;
+		this.postCnts = postCnts;
+		this.postDvCd = postDvCd;
+		this.rplNo = rplNo;
+		this.rplUpprNo = rplUpprNo;
+		this.tagUserId = tagUserId;
+		this.rplCnts = rplCnts;
+		this.atcfYn = atcfYn != null ? atcfYn : "N";
+		this.stopYn = stopYn;
+		this.stopDvCd = stopDvCd;
+		this.userId = userId;
+	}
+
 }
