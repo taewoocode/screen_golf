@@ -6,8 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.jwts.JwtProvider;
 import com.example.screen_golf.user.domain.User;
-import com.example.screen_golf.user.domain.UserRole;
-import com.example.screen_golf.user.domain.UserStatus;
+import com.example.screen_golf.user.dto.UserConverter;
 import com.example.screen_golf.user.dto.UserLoginInfo;
 import com.example.screen_golf.user.dto.UserLookUpId;
 import com.example.screen_golf.user.dto.UserLookUpName;
@@ -26,6 +25,7 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtProvider jwtProvider;
 	private final RedisUtil redisUtil;
+	private final UserConverter userConverter;
 
 	private static final String LOGIN_STATUS_PREFIX = "login:status:";
 	private static final String REFRESH_TOKEN_PREFIX = "refresh:token:";
@@ -44,34 +44,18 @@ public class UserServiceImpl implements UserService {
 	public UserSignUpInfo.UserSignUpResponse registerUser(UserSignUpInfo.UserSignUpRequest request) {
 		try {
 			log.info("회원가입 요청 시작 - 이메일: {}", request.getEmail());
-
 			if (userRepository.existsByEmail(request.getEmail())) {
 				log.warn("이미 존재하는 이메일: {}", request.getEmail());
 				throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
 			}
-
-			User user = User.builder()
-				.email(request.getEmail())
-				.password(passwordEncoder.encode(request.getPassword()))
-				.name(request.getName())
-				.phone(request.getPhone())
-				.profileImage(request.getProfileImage())
-				.role(UserRole.USER)
-				.status(UserStatus.ACTIVE)
-				.build();
+			User user = userConverter.makeEntity(request);
 			log.info("생성된 User 객체 - ID: {}, 이메일: {}", user.getId(), user.getEmail());
 
 			User savedUser = userRepository.save(user);
 			String generateToken = jwtProvider.generateToken(savedUser.getId());
 			log.info("저장된 User 객체 - ID: {}, 이메일: {}", savedUser.getId(), savedUser.getEmail());
-
-			UserSignUpInfo.UserSignUpResponse signUpResponse = UserSignUpInfo.UserSignUpResponse.builder()
-				.userId(savedUser.getId())
-				.email(savedUser.getEmail())
-				.name(savedUser.getName())
-				.role(savedUser.getRole())
-				.token(generateToken)
-				.build();
+			UserSignUpInfo.UserSignUpResponse signUpResponse = userConverter.makeSignUpResponse(savedUser,
+				generateToken);
 			log.info("회원가입 완료 - 사용자 ID: {}", signUpResponse.getUserId());
 			return signUpResponse;
 		} catch (IllegalArgumentException e) {
@@ -88,26 +72,10 @@ public class UserServiceImpl implements UserService {
 	public UserLookUpId.UserLookUpIdResponse findUser(UserLookUpId.UserLookUpIdRequest request) {
 		try {
 			log.info("회원 정보 조회 시작 - 사용자 ID: {}", request.getUserId());
-
-			// 1. 사용자 조회
 			User user = userRepository.findById(request.getUserId())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-			UserLookUpId.UserLookUpIdResponse findResponseUser
-				= UserLookUpId.UserLookUpIdResponse.builder()
-				.userId(user.getId())
-				.email(user.getEmail())
-				.name(user.getName())
-				.phone(user.getPhone())
-				.profileImage(user.getProfileImage())
-				.role(user.getRole())
-				.status(user.getStatus())
-				.createdAt(user.getCreatedAt())
-				.updatedAt(user.getUpdatedAt())
-				.build();
-
-			log.info("회원 정보 조회 완료 - 사용자 ID: {}", findResponseUser.getUserId());
-			return findResponseUser;
+			log.info("회원 정보 조회 완료 - 사용자 ID: {}", userConverter.makeFindUserEntity(user).getUserId());
+			return userConverter.makeFindUserEntity(user);
 		} catch (IllegalArgumentException e) {
 			log.error("회원 정보 조회 실패 (유효성 검사) - 사용자 ID: {}", request.getUserId(), e);
 			throw e;
@@ -122,23 +90,9 @@ public class UserServiceImpl implements UserService {
 	public UserLookUpName.UserLookUpNameResponse findUser(UserLookUpName.UserLookUpNameRequest request) {
 		try {
 			log.info("이름으로 회원 정보 조회 시작 - 이름: {}", request.getName());
-
 			User user = userRepository.findByName(request.getName())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이름입니다."));
-
-			UserLookUpName.UserLookUpNameResponse findNameUserResponse
-				= UserLookUpName.UserLookUpNameResponse.builder()
-				.userId(user.getId())
-				.email(user.getEmail())
-				.name(user.getName())
-				.phone(user.getPhone())
-				.profileImage(user.getProfileImage())
-				.role(user.getRole())
-				.status(user.getStatus())
-				.createdAt(user.getCreatedAt())
-				.updatedAt(user.getUpdatedAt())
-				.build();
-
+			UserLookUpName.UserLookUpNameResponse findNameUserResponse = userConverter.makeUserLookUpNameEntity(user);
 			log.info("이름으로 회원 정보 조회 완료 - 사용자 ID: {}", findNameUserResponse.getUserId());
 			return findNameUserResponse;
 		} catch (IllegalArgumentException e) {
@@ -167,14 +121,11 @@ public class UserServiceImpl implements UserService {
 			log.info("User {} is logging in after logout", user.getId());
 		}
 
-		// 로그인 상태를 ACTIVE로 설정
 		redisUtil.setDataExpire(loginKey, STATUS_ACTIVE, LOGIN_STATUS_EXPIRATION);
 
-		// 액세스 토큰과 리프레시 토큰 생성
 		String accessToken = jwtProvider.generateToken(user.getId());
 		String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
-		// 리프레시 토큰을 Redis에 저장
 		String refreshKey = REFRESH_TOKEN_PREFIX + user.getId();
 		redisUtil.setDataExpire(refreshKey, refreshToken, jwtProvider.getRefreshTokenExpiration());
 

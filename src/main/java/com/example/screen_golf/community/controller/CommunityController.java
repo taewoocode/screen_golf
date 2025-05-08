@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
@@ -16,6 +17,7 @@ import com.example.screen_golf.community.service.CommunityService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,4 +99,22 @@ public class CommunityController {
 		return ResponseEntity.ok(communityList);  // 조회된 목록을 200 OK로 반환
 	}
 
+	/**
+	 * 고급 검색 기능
+	 * @param request
+	 * @return
+	 */
+	@Operation(
+		summary = SwaggerDocs.SUMMARY_ADVANCED_SEARCH_COMMUNITY,
+		description = SwaggerDocs.DESCRIPTION_ADVANCED_SEARCH_COMMUNITY
+	)
+	@PostMapping("/search/advanced")
+	public ResponseEntity<CommunityAdvancedInfo.CommunityAdvancedSearchResponse> advancedSearch(
+		@Parameter(description = "검색 조건", required = true)
+		@RequestBody CommunityAdvancedInfo.CommunityAdvancedSearchRequest request
+	) {
+		log.info("고급 검색 요청: {}", request);
+		CommunityAdvancedInfo.CommunityAdvancedSearchResponse response = communityService.advancedSearch(request);
+		return ResponseEntity.ok(response);
+	}
 }

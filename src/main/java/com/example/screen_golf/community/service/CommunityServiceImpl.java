@@ -3,10 +3,15 @@ package com.example.screen_golf.community.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.community.domain.Community;
+import com.example.screen_golf.community.domain.CommunityDocument;
+import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunityConverter;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
@@ -26,16 +31,15 @@ public class CommunityServiceImpl implements CommunityService {
 	private final CommunityRepository communityRepository;
 	private final CommunityElasticSearchRepository communityElasticSearchRepository;
 
-	/**
-	 * 게시글 저장
-	 * @param request
-	 * @return
-	 */
 	@Override
 	@Transactional
 	public CommunitySaveInfo.CommunitySaveResponse savePost(CommunitySaveInfo.CommunitySaveRequest request) {
 		Community entity = CommunityConverter.toEntity(request);
 		Community savedPost = communityRepository.save(entity);
+
+		CommunityDocument document = CommunityConverter.toDocument(savedPost);
+		communityElasticSearchRepository.save(document);
+
 		return CommunityConverter.toResponse(savedPost);
 	}
 
@@ -66,12 +70,12 @@ public class CommunityServiceImpl implements CommunityService {
 		try {
 			if (communityRepository.existsById(id)) {
 				communityRepository.deleteById(id);
-				log.info("게시글이 삭제되었습니다={}", id);  // 한글로 변경
+				log.info("게시글이 삭제되었습니다={}", id);
 			} else {
-				log.warn("게시글을 찾을 수 없습니다={}", id);  // 한글로 변경
+				log.warn("게시글을 찾을 수 없습니다={}", id);
 			}
 		} catch (Exception e) {
-			log.error("게시글 삭제 중 오류 발생={}", e.getMessage());  // 한글로 변경
+			log.error("게시글 삭제 중 오류 발생={}", e.getMessage());
 			throw new RuntimeException("게시글 삭제 실패.");
 		}
 	}
@@ -90,7 +94,48 @@ public class CommunityServiceImpl implements CommunityService {
 	 * @param community
 	 * @return
 	 */
-	private int getCommentCountForCommunity(Community community) {
+	protected int getCommentCountForCommunity(Community community) {
 		return communityRepository.countByParentReplyNumber(community.getPostNumber());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CommunityAdvancedInfo.CommunityAdvancedSearchResponse advancedSearch(
+		CommunityAdvancedInfo.CommunityAdvancedSearchRequest request) {
+
+		Sort sort = Sort.by(
+			Sort.Direction.fromString(request.getSortDirection()),
+			request.getSortBy()
+		);
+		Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
+
+		List<Community> communities = communityElasticSearchRepository.findByKeywordAndPostType(
+			request.getKeyword(),
+			request.getPostType().name()
+		);
+
+		if (request.getStartDate() != null && request.getEndDate() != null) {
+			communities = communities.stream()
+				.filter(community ->
+					!community.getCreatedAt().isBefore(request.getStartDate()) &&
+						!community.getCreatedAt().isAfter(request.getEndDate()))
+				.collect(Collectors.toList());
+		}
+
+		int start = (int)pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), communities.size());
+		List<Community> pagedCommunities = communities.subList(start, end);
+
+		List<CommunityAdvancedInfo.CommunityAdvancedSearchResponse.CommunityItem> responses = pagedCommunities.stream()
+			.map(community -> {
+				int commentCount = communityRepository.countByParentReplyNumber(community.getPostNumber());
+				return CommunityConverter.toAdvancedSearchResponse(community, commentCount);
+			})
+			.collect(Collectors.toList());
+
+		CommunityConverter.PagingInfo pagingInfo = CommunityConverter.createPagingInfo(
+			start, end, communities.size(), request.getSize(), request.getPage());
+
+		return CommunityConverter.toMakeAdvancedResponse(responses, pagingInfo);
 	}
 }

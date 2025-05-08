@@ -1,5 +1,7 @@
 package com.example.screen_golf.community.dto;
 
+import java.time.LocalDateTime;
+
 import com.example.screen_golf.community.domain.PostType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import lombok.ToString;
 
 public class CommunitySaveInfo {
 
@@ -17,6 +19,7 @@ public class CommunitySaveInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
+	@ToString
 	public static class CommunitySaveRequest {
 
 		@NotBlank(message = "제목은 필수 입력값입니다.")
@@ -32,8 +35,8 @@ public class CommunitySaveInfo {
 		@NotNull(message = "사용자 아이디는 필수 입력값입니다.")
 		private Long authorId;
 
-		private String hasAttachment = "N";  // 기본값 N
-		private String isBlocked = "N";      // 기본값 N
+		private String hasAttachment = "false";  // 기본값 N
+		private String isBlocked = "false";      // 기본값 N
 	}
 
 	@Getter

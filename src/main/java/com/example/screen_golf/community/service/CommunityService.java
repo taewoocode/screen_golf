@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
@@ -26,4 +27,16 @@ public interface CommunityService {
 	 */
 	@Transactional
 	CommunityUpdateInfo.CommunityUpdateResponse updatePost(CommunityUpdateInfo.CommunityUpdateRequest request);
+
+	/**
+	 * 고급 검색 기능
+	 * - 키워드 검색
+	 * - 게시글 타입 필터링
+	 * - 날짜 범위 검색
+	 * - 페이징 처리
+	 * - 정렬 기능
+	 */
+	@Transactional(readOnly = true)
+	CommunityAdvancedInfo.CommunityAdvancedSearchResponse advancedSearch(
+		CommunityAdvancedInfo.CommunityAdvancedSearchRequest request);
 }

@@ -119,4 +119,10 @@ public class SwaggerDocs {
 	public static final String SUMMARY_FIND_KEYWORD_COMMUNITY = "게시글 조회 요청";
 	public static final String DESCRIPTION_FIND_KEYWORD_COMMUNITY =
 		"게시글 삭제 조회를 진행합니다.";
+
+	public static final String SUMMARY_ADVANCED_SEARCH_COMMUNITY = "고급 검색";
+	public static final String DESCRIPTION_ADVANCED_SEARCH_COMMUNITY =
+		"키워드, 게시글 타입, 날짜 범위, 페이징, 정렬을 이용한 고급 검색을 수행합니다. " +
+			"제목과 내용에서 동시에 검색하며, 게시글 타입으로 필터링하고, " +
+			"날짜 범위 내의 게시글만 검색합니다. 페이징과 정렬 기능을 지원합니다.";
 }
