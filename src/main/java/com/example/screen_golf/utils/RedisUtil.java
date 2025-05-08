@@ -19,6 +19,12 @@ public class RedisUtil {
 		redisTemplate.opsForValue().set(key, value);
 	}
 
+	/**
+	 *
+	 * @param key
+	 * @param value
+	 * @param duration
+	 */
 	public void setDataExpire(String key, String value, long duration) {
 		redisTemplate.opsForValue().set(key, value, duration, TimeUnit.MILLISECONDS);
 	}
