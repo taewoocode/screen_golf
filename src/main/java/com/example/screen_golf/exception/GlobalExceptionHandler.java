@@ -162,10 +162,9 @@ public class GlobalExceptionHandler {
 	 */
 
 	@ExceptionHandler(PaymentNotCompletedException.class)
-	public ResponseEntity<String> handleCouponNotFoundException(PaymentNotCompletedException e) {
+	public ResponseEntity<String> handlePaymentNotCompletedException(PaymentNotCompletedException e) {
 		log.error("결제 오류: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
 	}
 
 	/**=========================================================================
@@ -173,11 +172,10 @@ public class GlobalExceptionHandler {
 	 * =========================================================================
 	 */
 
-	@ExceptionHandler(PaymentNotCompletedException.class)
+	@ExceptionHandler(CommunityNotFoundException.class)
 	public ResponseEntity<String> handleCommunityNotFoundException(CommunityNotFoundException e) {
-		log.error("결제 오류: {}", e.getMessage(), e);
+		log.error("게시글 찾기 오류: {}", e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
 	}
 
 }
