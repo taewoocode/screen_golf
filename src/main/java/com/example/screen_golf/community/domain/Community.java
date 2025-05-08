@@ -110,4 +110,10 @@ public class Community {
 		this.blockType = blockType;
 		this.authorId = authorId;
 	}
+
+	public void update(String title, String content) {
+		this.title = title;
+		this.content = content;
+		this.updatedAt = LocalDateTime.now();
+	}
 }
