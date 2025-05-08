@@ -111,4 +111,12 @@ public class SwaggerDocs {
 	public static final String SUMMARY_UPDATE_COMMUNITY = "게시글 수정 요청";
 	public static final String DESCRIPTION_UPDATE_COMMUNITY =
 		"게시글 수정 요청을 진행합니다.";
+
+	public static final String SUMMARY_DELETE_COMMUNITY = "게시글 삭제 요청";
+	public static final String DESCRIPTION_DELETE_COMMUNITY =
+		"게시글 삭제 요청을 진행합니다.";
+
+	public static final String SUMMARY_FIND_KEYWORD_COMMUNITY = "게시글 조회 요청";
+	public static final String DESCRIPTION_FIND_KEYWORD_COMMUNITY =
+		"게시글 삭제 조회를 진행합니다.";
 }
