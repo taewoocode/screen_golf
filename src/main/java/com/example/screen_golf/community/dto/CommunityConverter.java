@@ -3,6 +3,7 @@ package com.example.screen_golf.community.dto;
 import java.util.List;
 
 import com.example.screen_golf.community.domain.Community;
+import com.example.screen_golf.community.domain.CommunityDocument;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -40,8 +41,9 @@ public class CommunityConverter {
 			.content(request.getContent())
 			.postType(request.getPostType())
 			.authorId(request.getAuthorId())
-			.hasAttachment(request.getHasAttachment())
-			.isBlocked(request.getIsBlocked())
+			.hasAttachment(request.getHasAttachment() != null ? request.getHasAttachment() : "N")
+			.isBlocked(request.getIsBlocked() != null ? request.getIsBlocked() : "N")
+			.replyNumber(0)  // 게시글의 경우 reply_number는 0으로 설정
 			.build();
 	}
 
@@ -114,7 +116,7 @@ public class CommunityConverter {
 		}
 
 		public int getTotalPages() {
-			return (int) Math.ceil((double) totalSize / pageSize);
+			return (int)Math.ceil((double)totalSize / pageSize);
 		}
 	}
 
@@ -137,7 +139,7 @@ public class CommunityConverter {
 	public static CommunityAdvancedInfo.CommunityAdvancedSearchResponse toMakeAdvancedResponse(
 		List<CommunityAdvancedInfo.CommunityAdvancedSearchResponse.CommunityItem> items,
 		PagingInfo pagingInfo) {
-		
+
 		return CommunityAdvancedInfo.CommunityAdvancedSearchResponse.builder()
 			.communities(items)
 			.totalElements(pagingInfo.getTotalSize())
@@ -148,4 +150,19 @@ public class CommunityConverter {
 			.hasPrevious(pagingInfo.hasPrevious())
 			.build();
 	}
+
+	public static CommunityDocument toDocument(Community entity) {
+		return CommunityDocument.builder()
+			.id(entity.getId())
+			.title(entity.getTitle())
+			.content(entity.getContent())
+			.postType(entity.getPostType().name())
+			.hasAttachment(entity.getHasAttachment())
+			.isBlocked(entity.getIsBlocked())
+			.authorId(entity.getAuthorId())
+			.createdAt(entity.getCreatedAt())
+			.updatedAt(entity.getUpdatedAt())
+			.build();
+	}
+
 }
