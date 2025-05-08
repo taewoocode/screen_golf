@@ -25,7 +25,7 @@ public class CommunityServiceImpl implements CommunityService {
 	private final CommunityElasticSearchRepository communityElasticSearchRepository;
 
 	/**
-	 *
+	 * 게시글 저장
 	 * @param request
 	 * @return
 	 */
@@ -38,6 +38,7 @@ public class CommunityServiceImpl implements CommunityService {
 	}
 
 	/**
+	 * 키워드로 게시글을 조회할 때 댓글 수를 함께 반환
 	 * @param request
 	 * @return
 	 */
@@ -46,11 +47,18 @@ public class CommunityServiceImpl implements CommunityService {
 		CommunitySearchListInfo.CommunitySearchListRequest request) {
 		List<Community> communities = communityElasticSearchRepository.findByKeyword(request.getKeyword());
 		return communities.stream()
-			.map(CommunityConverter::toCommunitySearchListResponse)
+			.map(community -> {
+				int commentCount = getCommentCountForCommunity(community);
+				return CommunityConverter.toCommunitySearchListResponse(community, commentCount);
+			})
 			.collect(Collectors.toList());
 	}
 
-	// 댓글 수 조회
+	/**
+	 * 댓글 수 조회
+	 * @param community
+	 * @return
+	 */
 	private int getCommentCountForCommunity(Community community) {
 		return communityRepository.countByParentReplyNumber(community.getPostNumber());
 	}
