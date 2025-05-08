@@ -8,8 +8,9 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import com.example.screen_golf.community.domain.Community;
+import com.example.screen_golf.community.domain.CommunityDocument;
 
-public interface CommunityElasticSearchRepository extends ElasticsearchRepository<Community, Long> {
+public interface CommunityElasticSearchRepository extends ElasticsearchRepository<CommunityDocument, Long> {
 
 	/**
 	 * 기본 키워드 검색
@@ -17,15 +18,15 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - 기본적인 전문 검색 기능 제공
 	 */
 	@Query("""
-		{
-			"query": {
-				"multi_match": {
-					"query": "?0",
-					"fields": ["title", "content"]
+			{
+				"query": {
+					"multi_match": {
+						"query": "?0",
+						"fields": ["title", "content"]
+					}
 				}
 			}
-		}
-	""")
+		""")
 	List<Community> findByKeyword(String keyword);
 
 	/**
@@ -35,30 +36,30 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - 생성일 기준 내림차순 정렬
 	 */
 	@Query("""
-		{
-			"query": {
-				"bool": {
-					"must": [
-						{
-							"multi_match": {
-								"query": "?0",
-								"fields": ["title^2", "content"],
-								"type": "best_fields",
-								"operator": "and"
+			{
+				"query": {
+					"bool": {
+						"must": [
+							{
+								"multi_match": {
+									"query": "?0",
+									"fields": ["title^2", "content"],
+									"type": "best_fields",
+									"operator": "and"
+								}
 							}
-						}
-					],
-					"filter": [
-						{ "term": { "postType": "?1" } },
-						{ "term": { "isBlocked": "N" } }
-					]
-				}
-			},
-			"sort": [
-				{ "createdAt": "desc" }
-			]
-		}
-	""")
+						],
+						"filter": [
+							{ "term": { "postType": "?1" } },
+							{ "term": { "isBlocked": "N" } }
+						]
+					}
+				},
+				"sort": [
+					{ "createdAt": "desc" }
+				]
+			}
+		""")
 	List<Community> findByKeywordAndPostType(String keyword, String postType);
 
 	/**
@@ -68,28 +69,28 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - 생성일 기준 내림차순 정렬
 	 */
 	@Query("""
-		{
-			"query": {
-				"bool": {
-					"must": [
-						{
-							"range": {
-								"createdAt": {
-									"gte": "?0",
-									"lte": "?1"
+			{
+				"query": {
+					"bool": {
+						"must": [
+							{
+								"range": {
+									"createdAt": {
+										"gte": "?0",
+										"lte": "?1"
+									}
 								}
 							}
-						}
-					]
-				}
-			},
-			"sort": [
-				{ "createdAt": "desc" }
-			],
-			"from": ?2,
-			"size": ?3
-		}
-	""")
+						]
+					}
+				},
+				"sort": [
+					{ "createdAt": "desc" }
+				],
+				"from": ?2,
+				"size": ?3
+			}
+		""")
 	List<Community> findByDateRange(LocalDateTime startDate, LocalDateTime endDate, int from, int size);
 
 	/**
@@ -99,28 +100,28 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - should 조건으로 OR 검색 지원
 	 */
 	@Query("""
-		{
-			"query": {
-				"bool": {
-					"should": [
-						{
-							"multi_match": {
-								"query": "?0",
-								"fields": ["title^3", "content^2"],
-								"type": "best_fields"
+			{
+				"query": {
+					"bool": {
+						"should": [
+							{
+								"multi_match": {
+									"query": "?0",
+									"fields": ["title^3", "content^2"],
+									"type": "best_fields"
+								}
+							},
+							{
+								"match": {
+									"authorId": "?1"
+								}
 							}
-						},
-						{
-							"match": {
-								"authorId": "?1"
-							}
-						}
-					],
-					"minimum_should_match": 1
+						],
+						"minimum_should_match": 1
+					}
 				}
 			}
-		}
-	""")
+		""")
 	List<Community> findByKeywordOrAuthor(String keyword, Long authorId);
 
 	/**
@@ -130,17 +131,17 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - 접두어 2글자 이상 일치 필요
 	 */
 	@Query("""
-		{
-			"query": {
-				"multi_match": {
-					"query": "?0",
-					"fields": ["title", "content"],
-					"fuzziness": "AUTO",
-					"prefix_length": 2
+			{
+				"query": {
+					"multi_match": {
+						"query": "?0",
+						"fields": ["title", "content"],
+						"fuzziness": "AUTO",
+						"prefix_length": 2
+					}
 				}
 			}
-		}
-	""")
+		""")
 	List<Community> findByKeywordFuzzy(String keyword);
 
 	/**
@@ -150,24 +151,24 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - SearchHits로 하이라이팅 정보 포함
 	 */
 	@Query("""
-		{
-			"query": {
-				"multi_match": {
-					"query": "?0",
-					"fields": ["title", "content"]
-				}
-			},
-			"highlight": {
-				"fields": {
-					"title": {},
-					"content": {
-						"fragment_size": 150,
-						"number_of_fragments": 3
+			{
+				"query": {
+					"multi_match": {
+						"query": "?0",
+						"fields": ["title", "content"]
+					}
+				},
+				"highlight": {
+					"fields": {
+						"title": {},
+						"content": {
+							"fragment_size": 150,
+							"number_of_fragments": 3
+						}
 					}
 				}
 			}
-		}
-	""")
+		""")
 	SearchHits<Community> findByKeywordWithHighlight(String keyword);
 
 	/**
@@ -177,22 +178,22 @@ public interface CommunityElasticSearchRepository extends ElasticsearchRepositor
 	 * - SearchHits로 집계 결과 포함
 	 */
 	@Query("""
-		{
-			"size": 0,
-			"aggs": {
-				"post_types": {
-					"terms": {
-						"field": "postType"
-					}
-				},
-				"daily_posts": {
-					"date_histogram": {
-						"field": "createdAt",
-						"calendar_interval": "day"
+			{
+				"size": 0,
+				"aggs": {
+					"post_types": {
+						"terms": {
+							"field": "postType"
+						}
+					},
+					"daily_posts": {
+						"date_histogram": {
+							"field": "createdAt",
+							"calendar_interval": "day"
+						}
 					}
 				}
 			}
-		}
-	""")
+		""")
 	SearchHits<Community> getPostStatistics();
 }
