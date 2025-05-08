@@ -57,4 +57,13 @@ public class CommunityConverter {
 			.commentCount(commentCount)  // 댓글 수
 			.build();
 	}
+
+	public static CommunityUpdateInfo.CommunityUpdateResponse toUpdateResponse(Community community) {
+		return CommunityUpdateInfo.CommunityUpdateResponse.builder()
+			.id(community.getId())
+			.title(community.getTitle())
+			.content(community.getContent())
+			.updateAt(community.getUpdatedAt())
+			.build();
+	}
 }
