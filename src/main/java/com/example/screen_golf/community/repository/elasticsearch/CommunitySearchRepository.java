@@ -1,4 +1,4 @@
-package com.example.screen_golf.community.repository;
+package com.example.screen_golf.community.repository.elasticsearch;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
