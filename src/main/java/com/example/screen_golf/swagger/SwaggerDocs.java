@@ -107,4 +107,8 @@ public class SwaggerDocs {
 	public static final String SUMMARY_REQUEST_COMMUNITY = "게시글 작성 요청";
 	public static final String DESCRIPTION_REQUEST_COMMUNITY =
 		"게시글 작성 요청을 진행합니다.";
+
+	public static final String SUMMARY_UPDATE_COMMUNITY = "게시글 수정 요청";
+	public static final String DESCRIPTION_UPDATE_COMMUNITY =
+		"게시글 수정 요청을 진행합니다.";
 }
