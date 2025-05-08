@@ -28,6 +28,12 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
+  elasticsearch:
+    client:
+      hosts: ${ELASTIC_SEARCH_HOST}
+    rest:
+      uris: ${ELASTIC_SEARCH_URI}
+
 logging:
   file:
     name: logs/application.log
@@ -59,6 +65,7 @@ springdoc:
 jwt:
   secret: ${GOLF_JWT_SECRET}
   expiration: ${GOLF_JWT_EXPIRATION}
+  refresh-expiration: ${GOLF_JWT_REFRESH_EXPIRATION}
 
 kakaopay:
   client-id: ${KAKAOPAY_CLIENT_ID}

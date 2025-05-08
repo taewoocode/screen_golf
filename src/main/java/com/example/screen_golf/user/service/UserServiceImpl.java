@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
 	private final RedisUtil redisUtil;
 
 	private static final String LOGIN_STATUS_PREFIX = "login:status:";
+	private static final String REFRESH_TOKEN_PREFIX = "refresh:token:";
 	private static final long LOGIN_STATUS_EXPIRATION = 24 * 60 * 60 * 1000; // 24시간
 
 	private static final String STATUS_ACTIVE = "ACTIVE";
@@ -150,7 +151,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public UserLoginInfo.UserLoginResponse login(UserLoginInfo.UserLoginRequest request) {
 		User user = userRepository.findByEmail(request.getEmail())
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
@@ -166,14 +167,32 @@ public class UserServiceImpl implements UserService {
 			log.info("User {} is logging in after logout", user.getId());
 		}
 
+		// 로그인 상태를 ACTIVE로 설정
 		redisUtil.setDataExpire(loginKey, STATUS_ACTIVE, LOGIN_STATUS_EXPIRATION);
 
-		String generateToken = jwtProvider.generateToken(user.getId());
+		// 액세스 토큰과 리프레시 토큰 생성
+		String accessToken = jwtProvider.generateToken(user.getId());
+		String refreshToken = jwtProvider.generateRefreshToken(user.getId());
+
+		// 리프레시 토큰을 Redis에 저장
+		String refreshKey = REFRESH_TOKEN_PREFIX + user.getId();
+		redisUtil.setDataExpire(refreshKey, refreshToken, jwtProvider.getRefreshTokenExpiration());
+
 		log.info("User {} logged in successfully", user.getId());
 
-		return new UserLoginInfo.UserLoginResponse((user.getId()), user.getEmail(), generateToken);
+		return UserLoginInfo.UserLoginResponse.builder()
+			.userId(user.getId())
+			.email(user.getEmail())
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build();
 	}
 
+	/**
+	 * 유저상태 추적
+	 * @param userId
+	 * @return
+	 */
 	@Override
 	public boolean isUserLoggedIn(Long userId) {
 		String loginKey = LOGIN_STATUS_PREFIX + userId;
@@ -181,10 +200,38 @@ public class UserServiceImpl implements UserService {
 		return STATUS_ACTIVE.equals(status);
 	}
 
+	/**
+	 * Logout
+	 * @param userId
+	 */
 	@Override
 	public void logout(Long userId) {
 		String loginKey = LOGIN_STATUS_PREFIX + userId;
+		String refreshKey = REFRESH_TOKEN_PREFIX + userId;
 		redisUtil.setDataExpire(loginKey, STATUS_INACTIVE, LOGIN_STATUS_EXPIRATION);
+		redisUtil.deleteData(refreshKey);
+
 		log.info("User {} logged out", userId);
+	}
+
+	// 리프레시 토큰으로 새로운 액세스 토큰 발급
+	public String refreshAccessToken(String refreshToken) {
+		if (!jwtProvider.validateToken(refreshToken)) {
+			throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+		}
+
+		Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+		String refreshKey = REFRESH_TOKEN_PREFIX + userId;
+		String storedRefreshToken = redisUtil.getData(refreshKey);
+
+		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+			throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+		}
+
+		// 새로운 액세스 토큰 발급
+		String newAccessToken = jwtProvider.generateToken(userId);
+		log.info("New access token issued for user {}", userId);
+
+		return newAccessToken;
 	}
 }
