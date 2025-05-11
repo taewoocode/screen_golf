@@ -49,12 +49,5 @@ public class Point {
 		this.amount = amount;
 		this.type = pointType;
 		this.createdAt = createdAt;
-		validateChargeUnit(amount, pointType);
-	}
-
-	private void validateChargeUnit(Integer amount, PointType pointType) {
-		if (type == PointType.CHARGE && amount % 5000 != 0) {
-			throw new IllegalArgumentException("포인트는 5,000원 단위로만 충전할 수 있습니다.");
-		}
 	}
 }

@@ -50,6 +50,10 @@ dependencies {
     //ElasticSearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+
 }
 
 tasks.named('test') {
