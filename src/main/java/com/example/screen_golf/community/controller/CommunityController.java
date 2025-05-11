@@ -15,10 +15,12 @@ import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
 import com.example.screen_golf.community.service.CommunityService;
 import com.example.screen_golf.swagger.SwaggerDocs;
+import com.example.screen_golf.utils.SecurityUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
-@Tag(name = "Community", description = "Community 관련 API")
+@Tag(name = "Community", description = "커뮤니티 관련 API")
 public class CommunityController {
 
 	private final CommunityService communityService;
@@ -42,9 +44,12 @@ public class CommunityController {
 	)
 	@PostMapping
 	public ResponseEntity<CommunitySaveInfo.CommunitySaveResponse> createPost(
-		@RequestBody CommunitySaveInfo.CommunitySaveRequest request) {
-		log.info("게시글 작성 요청: {}", request);
+		@Valid @RequestBody CommunitySaveInfo.CommunitySaveRequest request
+	) {
+		Long currentUserId = SecurityUtil.getCurrentUserId();
+		log.info("게시글 작성 요청 - 제목: {}, 작성자 ID: {}", request.getTitle(), currentUserId);
 		CommunitySaveInfo.CommunitySaveResponse response = communityService.savePost(request);
+		log.info("게시글 작성 완료 - 게시글 ID: {}", response.getId());
 		return ResponseEntity.ok(response);
 	}
 
