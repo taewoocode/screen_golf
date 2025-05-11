@@ -8,8 +8,8 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       idle-timeout: 300000
-      max-lifetime: 1200000
       connection-timeout: 20000
+      max-lifetime: 1200000
 
   jpa:
     hibernate:
@@ -27,48 +27,53 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: ${ELASTIC_SEARCH_URI}
 
-  elasticsearch:
-    client:
-      hosts: ${ELASTIC_SEARCH_HOST}
-    rest:
-      uris: ${ELASTIC_SEARCH_URI}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: ${KAFKA_PRODUCER_KEY_SERIALIZER}
+      value-serializer: ${KAFKA_PRODUCER_VALUE_SERIALIZER}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID}
+      auto-offset-reset: ${KAFKA_CONSUMER_AUTO_OFFSET_RESET}
+      key-deserializer: ${KAFKA_CONSUMER_KEY_DESERIALIZER}
+      value-deserializer: ${KAFKA_CONSUMER_VALUE_DESERIALIZER}
 
 logging:
   file:
     name: logs/application.log
-    max-size: 10MB
-    max-history: 30
   pattern:
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-  discord:
-    webhook-uri: ${DISCORD_WEBHOOK_URI}
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.example.screen_golf: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 springdoc:
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
-  paths-to-match: /api/**
-  swagger-ui:
-    path: /api-test
-    display-request-duration: true
-    groups-order: DESC
-    operations-sorter: method
-    disable-swagger-default-url: false
-    urls:
-      - url: http://localhost:8080/v3/api-docs
-        name: ScreenGolf API Docs
   api-docs:
-    groups:
-      enabled: true
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 jwt:
   secret: ${GOLF_JWT_SECRET}
   expiration: ${GOLF_JWT_EXPIRATION}
   refresh-expiration: ${GOLF_JWT_REFRESH_EXPIRATION}
 
-kakaopay:
-  client-id: ${KAKAOPAY_CLIENT_ID}
-  client-secret: ${KAKAOPAY_CLIENT_SECRET}
-  secret-key: ${KAKAOPAY_SECRET_KEY}
+kakao:
+  pay:
+    admin-key: ${KAKAOPAY_ADMIN_KEY}
+    secret-key: ${KAKAOPAY_SECRET_KEY}
+
+discord:
+  webhook-uri: ${DISCORD_WEBHOOK_URI}
+
+server:
+  port: 8080
 
