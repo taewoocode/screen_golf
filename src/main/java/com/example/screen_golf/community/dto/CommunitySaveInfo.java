@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.example.screen_golf.community.domain.PostType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,19 +25,22 @@ public class CommunitySaveInfo {
 
 		@NotBlank(message = "제목은 필수 입력값입니다.")
 		@Size(max = 255, message = "제목은 255자를 초과할 수 없습니다.")
+		@Schema(description = "게시글 제목", example = "테스트 게시글")
 		private String title;
 
 		@NotBlank(message = "내용은 필수 입력값입니다.")
+		@Schema(description = "게시글 내용", example = "테스트 내용입니다.")
 		private String content;
 
 		@NotNull(message = "게시글 구분코드는 필수 입력값입니다.")
+		@Schema(description = "게시글 타입", example = "NOTICE")
 		private PostType postType;
 
-		@NotNull(message = "사용자 아이디는 필수 입력값입니다.")
-		private Long authorId;
+		@Schema(description = "첨부파일 여부", example = "N", defaultValue = "N")
+		private String hasAttachment = "N";  // 기본값 N
 
-		private String hasAttachment = "false";  // 기본값 N
-		private String isBlocked = "false";      // 기본값 N
+		@Schema(description = "차단 여부", example = "N", defaultValue = "N")
+		private String isBlocked = "N";      // 기본값 N
 	}
 
 	@Getter
