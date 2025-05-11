@@ -34,7 +34,6 @@ public class JwtProvider {
 	@PostConstruct
 	protected void init() {
 		byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
-		// 비밀 키가 32바이트(256비트)보다 짧으면 SHA-256 해시를 사용하여 길이를 맞춥니다.
 		if (keyBytes.length < 32) {
 			try {
 				MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
