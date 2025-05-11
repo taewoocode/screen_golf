@@ -34,7 +34,11 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional
 	public CommunitySaveInfo.CommunitySaveResponse savePost(CommunitySaveInfo.CommunitySaveRequest request) {
-		Community entity = CommunityConverter.toEntity(request);
+		Integer maxPostNumber = communityRepository.findAll().stream()
+			.map(Community::getPostNumber)
+			.max(Integer::compareTo)
+			.orElse(0);
+		Community entity = CommunityConverter.toMakeCommunitySaveEntity(request, maxPostNumber + 1);
 		Community savedPost = communityRepository.save(entity);
 
 		CommunityDocument document = CommunityConverter.toDocument(savedPost);
