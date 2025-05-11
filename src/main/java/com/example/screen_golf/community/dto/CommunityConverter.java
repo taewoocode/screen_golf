@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.screen_golf.community.domain.Community;
 import com.example.screen_golf.community.domain.CommunityDocument;
+import com.example.screen_golf.utils.SecurityUtil;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -31,19 +32,22 @@ public class CommunityConverter {
 	}
 
 	/**
-	 * CommunitySaveRequest -> Community로 변환 -> Save 로직
+	 * CommunitySaveRequest -> Community로 변환 (postNumber 포함)
 	 * @param request
+	 * @param postNumber
 	 * @return
 	 */
-	public static Community toEntity(CommunitySaveInfo.CommunitySaveRequest request) {
+	public static Community toMakeCommunitySaveEntity(CommunitySaveInfo.CommunitySaveRequest request,
+		Integer postNumber) {
 		return Community.builder()
+			.postNumber(postNumber)
 			.title(request.getTitle())
 			.content(request.getContent())
 			.postType(request.getPostType())
-			.authorId(request.getAuthorId())
+			.authorId(SecurityUtil.getCurrentUserId())
 			.hasAttachment(request.getHasAttachment() != null ? request.getHasAttachment() : "N")
 			.isBlocked(request.getIsBlocked() != null ? request.getIsBlocked() : "N")
-			.replyNumber(0)  // 게시글의 경우 reply_number는 0으로 설정
+			.replyNumber(0)
 			.build();
 	}
 
