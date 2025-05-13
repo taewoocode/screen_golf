@@ -125,4 +125,21 @@ public class SwaggerDocs {
 		"키워드, 게시글 타입, 날짜 범위, 페이징, 정렬을 이용한 고급 검색을 수행합니다. " +
 			"제목과 내용에서 동시에 검색하며, 게시글 타입으로 필터링하고, " +
 			"날짜 범위 내의 게시글만 검색합니다. 페이징과 정렬 기능을 지원합니다.";
+
+	/**===================================================================
+	 *                   Point 관련
+	 * ===================================================================
+	 */
+
+	public static final String SUMMARY_GET_CURRENT_POINT = "현재 보유 포인트 조회";
+	public static final String DESCRIPTION_GET_CURRENT_POINT = "사용자의 현재 보유 포인트를 조회합니다.";
+
+	public static final String SUMMARY_CHECK_POINT_AVAILABILITY = "포인트 사용 가능 여부 확인";
+	public static final String DESCRIPTION_CHECK_POINT_AVAILABILITY = "사용하려는 포인트 금액이 사용 가능한지 확인합니다.";
+
+	public static final String SUMMARY_USE_POINT = "포인트 사용";
+	public static final String DESCRIPTION_USE_POINT = "포인트를 사용합니다. 사용 가능한 포인트가 부족하면 예외가 발생합니다.";
+
+	public static final String SUMMARY_GET_POINT_HISTORY = "포인트 내역 조회";
+	public static final String DESCRIPTION_GET_POINT_HISTORY = "사용자의 포인트 사용/적립 내역을 조회합니다. 최신 내역부터 정렬됩니다.";
 }

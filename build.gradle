@@ -28,7 +28,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     // Swagger 문서 추가
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
     // Lombok 추가
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -53,6 +53,7 @@ dependencies {
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
 }
 

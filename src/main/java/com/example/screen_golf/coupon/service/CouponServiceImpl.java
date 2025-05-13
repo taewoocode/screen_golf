@@ -118,4 +118,23 @@ public class CouponServiceImpl implements CouponService {
 			.map(CouponListInfo.UserCouponListResponse::toDto)
 			.collect(Collectors.toList());
 	}
+
+	@Override
+	@Transactional
+	public Integer validateAndUseCoupon(Long couponId, Integer originalAmount) {
+		Coupon coupon = userCouponRepository.findById(couponId)
+			.orElseThrow(() -> new IllegalArgumentException("유효한 쿠폰을 찾을 수 없습니다."));
+
+		if (!coupon.isValid()) {
+			throw new IllegalArgumentException("유효하지 않은 쿠폰입니다.");
+		}
+		if (!coupon.isAvailable()) {
+			throw new IllegalArgumentException("이미 사용된 쿠폰입니다.");
+		}
+		
+		coupon.use();
+		userCouponRepository.save(coupon);
+
+		return coupon.getPolicy().calculateDiscount(originalAmount);
+	}
 }

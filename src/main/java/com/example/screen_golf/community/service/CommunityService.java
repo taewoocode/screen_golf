@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
+import com.example.screen_golf.community.dto.CommunityFuzzySearchInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
@@ -39,4 +40,14 @@ public interface CommunityService {
 	@Transactional(readOnly = true)
 	CommunityAdvancedInfo.CommunityAdvancedSearchResponse advancedSearch(
 		CommunityAdvancedInfo.CommunityAdvancedSearchRequest request);
+
+	/**
+	 * 퍼지 검색 기능
+	 * - 오타 허용 검색
+	 * - 자동 퍼지니스 설정
+	 * - 접두어 2글자 이상 일치 필요
+	 */
+	@Transactional(readOnly = true)
+	List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> fuzzySearch(
+		CommunityFuzzySearchInfo.CommunityFuzzySearchRequest request);
 }

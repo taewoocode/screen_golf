@@ -24,13 +24,11 @@ public class PaymentInfo {
 	@AllArgsConstructor
 	public static class PaymentRequest {
 		private Long userId;
-		private Integer amount;
-
-		// 쿠폰 ID (하나의 결제에 하나의 쿠폰만 적용)
+		private Long roomId;
+		private Integer originalAmount;
+		private Integer finalAmount;     // 최종 결제 금액
+		private Integer usePoint;
 		private Long couponId;
-
-		// RoomPrice ID (가격 정보에 대한 참조)
-		private Long loomId;
 		private LocalDate reservationDate;
 		private LocalDateTime startTime;
 		private LocalDateTime endTime;

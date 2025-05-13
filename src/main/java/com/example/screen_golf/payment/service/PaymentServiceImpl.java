@@ -6,8 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.screen_golf.coupon.domain.Coupon;
-import com.example.screen_golf.coupon.repository.CouponRepository;
+import com.example.screen_golf.coupon.service.CouponService;
 import com.example.screen_golf.gateway.PaymentGateway;
 import com.example.screen_golf.notification.service.DiscordNotificationService;
 import com.example.screen_golf.payment.domain.Payment;
@@ -28,41 +27,48 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
 	private final PaymentRepository paymentRepository;
 	private final UserRepository userRepository;
-	private final CouponRepository couponRepository;
 	private final RoomRepository roomRepository;
-	private final PaymentGateway paymentGateway;
-	private final DiscordNotificationService discordNotificationService;
+	private final CouponService couponService;
 	private final PointService pointService;
-	private final KafkaTemplate<String, ReservationInfo.ReservationRequest> kafkaTemplate;
+	private final PaymentGateway paymentGateway;
 	private final PaymentConverter paymentConverter;
+	private final DiscordNotificationService discordNotificationService;
+	private final KafkaTemplate<String, ReservationInfo.ReservationRequest> kafkaTemplate;
 	private final ReservationConverter reservationConverter;
 
 	/**
 	 * 결제 요청 처리
 	 * 1. 사용자, 방 정보 조회
-	 * 2. 결제 금액 계산 (방 가격)
-	 * 3. 쿠폰 적용 (선택사항)
-	 * 4. Payment 엔티티 생성 (상태: PENDING)
+	 * 2. 쿠폰 유효성 검증 및 적용
+	 * 3. 포인트 사용 가능 여부 확인 및 처리
+	 * 4. Payment 엔티티 생성
 	 * 5. 카카오페이 결제 준비 요청
 	 */
 	@Override
-	@Transactional
 	public PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest request) {
 		User user = userRepository.findById(request.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-		Room room = roomRepository.findById(request.getLoomId())
+		Room room = roomRepository.findById(request.getRoomId())
 			.orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-		Integer price = room.calculatePrice(request.getReservationDate(), request.getStartTime(), request.getEndTime());
-		Integer finalAmount = applyCoupon(request, price);
-		Payment paymentEntity = paymentConverter.makePaymentEntity(user, room, finalAmount);
-		Payment savedPayment = paymentRepository.save(paymentEntity);
+		Integer finalAmount = request.getOriginalAmount();
+
+		if (request.getCouponId() != null) {
+			finalAmount = couponService.validateAndUseCoupon(request.getCouponId(), finalAmount);
+		}
+
+		if (request.getUsePoint() > 0) {
+			finalAmount = pointService.validateAndUsePoint(request.getUserId(), request.getUsePoint(), finalAmount);
+		}
+
+		Payment payment = paymentConverter.makePaymentEntity(user, room, finalAmount);
+		Payment savedPayment = paymentRepository.save(payment);
 
 		return paymentGateway.requestPayment(savedPayment);
 	}
@@ -108,47 +114,17 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
-	private void sendDiscordMessage(String orderId, Integer amount, Payment payment) {
-		String notificationMessage = String.format(
-			"💰 결제 완료\n" + "주문번호: %s\n" + "금액: %d원\n" + "결제자: %s\n" + "적립 포인트: %d원",
-			orderId, amount, payment.getUser().getName(), (int)(amount * 0.1)
-		);
-		discordNotificationService.sendPaymentNotification(notificationMessage);
-	}
-
 	@Override
 	@Transactional
 	public PaymentInfo.PaymentResponse cancelPayment(String paymentKey, String cancelReason) {
 		return paymentGateway.cancelPayment(paymentKey, cancelReason);
 	}
 
-	/**
-	 * 쿠폰 적용
-	 * 1. 쿠폰 ID가 있는 경우 해당 쿠폰 조회
-	 * 2. 쿠폰 유효성 검증
-	 * 3. 할인 금액 계산
-	 * 4. 쿠폰적용로직을 -> 쿠폰의 책임으로 리팩토링 예정
-	 */
-	private Integer applyCoupon(PaymentInfo.PaymentRequest request, Integer price) {
-		if (request.getCouponId() != null) {
-			Coupon coupon = couponRepository.findById(request.getCouponId())
-				.orElseThrow(() -> new IllegalArgumentException("유효한 쿠폰을 찾을 수 없습니다."));
-
-			if (!coupon.isValid()) {
-				throw new IllegalArgumentException("유효하지 않은 쿠폰입니다.");
-			}
-			if (!coupon.isAvailable()) {
-				throw new IllegalArgumentException("이미 사용된 쿠폰입니다.");
-			}
-
-			Integer discountAmount = coupon.calculateDiscount(price);
-			Integer finalAmount = price - discountAmount;
-
-			if (finalAmount < 0) {
-				finalAmount = 0;
-			}
-			return finalAmount;
-		}
-		return price;
+	private void sendDiscordMessage(String orderId, Integer amount, Payment payment) {
+		String notificationMessage = String.format(
+			"💰 결제 완료\n" + "주문번호: %s\n" + "금액: %d원\n" + "결제자: %s\n" + "적립 포인트: %d원",
+			orderId, amount, payment.getUser().getName(), (int)(amount * 0.1)
+		);
+		discordNotificationService.sendPaymentNotification(notificationMessage);
 	}
 }
