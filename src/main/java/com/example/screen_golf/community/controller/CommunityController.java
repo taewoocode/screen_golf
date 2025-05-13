@@ -13,6 +13,7 @@ import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
+import com.example.screen_golf.community.dto.CommunityFuzzySearchInfo;
 import com.example.screen_golf.community.service.CommunityService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 import com.example.screen_golf.utils.SecurityUtil;
@@ -121,5 +122,23 @@ public class CommunityController {
 		log.info("고급 검색 요청: {}", request);
 		CommunityAdvancedInfo.CommunityAdvancedSearchResponse response = communityService.advancedSearch(request);
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * 퍼지 검색 기능
+	 * - 오타 허용 검색
+	 * - 자동 퍼지니스 설정
+	 * - 접두어 2글자 이상 일치 필요
+	 */
+	@Operation(
+		summary = "퍼지 검색",
+		description = "오타를 허용하는 퍼지 검색 기능을 제공합니다."
+	)
+	@PostMapping("/search/fuzzy")
+	public ResponseEntity<List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse>> fuzzySearch(
+		@RequestBody CommunityFuzzySearchInfo.CommunityFuzzySearchRequest request
+	) {
+		List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> results = communityService.fuzzySearch(request);
+		return ResponseEntity.ok(results);
 	}
 }
