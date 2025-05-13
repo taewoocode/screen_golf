@@ -13,6 +13,7 @@ import com.example.screen_golf.community.domain.Community;
 import com.example.screen_golf.community.domain.CommunityDocument;
 import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
 import com.example.screen_golf.community.dto.CommunityConverter;
+import com.example.screen_golf.community.dto.CommunityFuzzySearchInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
@@ -141,5 +142,26 @@ public class CommunityServiceImpl implements CommunityService {
 			start, end, communities.size(), request.getSize(), request.getPage());
 
 		return CommunityConverter.toMakeAdvancedResponse(responses, pagingInfo);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> fuzzySearch(
+		CommunityFuzzySearchInfo.CommunityFuzzySearchRequest request) {
+		List<Community> communities = communityElasticSearchRepository.findByKeywordFuzzy(request.getKeyword());
+
+		return communities.stream()
+			.map(community -> {
+				int commentCount = getCommentCountForCommunity(community);
+				return CommunityFuzzySearchInfo.CommunityFuzzySearchResponse.builder()
+					.id(community.getId())
+					.title(community.getTitle())
+					.content(community.getContent())
+					.postType(community.getPostType().name())
+					.postTypeDesc(community.getPostType().getDescription())
+					.commentCount(commentCount)
+					.build();
+			})
+			.collect(Collectors.toList());
 	}
 }
