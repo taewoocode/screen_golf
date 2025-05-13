@@ -26,7 +26,7 @@
 
 본 프로젝트는 아래의 기술 스택과 환경을 기반으로 개발되었습니다.
 
-- **Framework**: Spring Boot `3.4.4`
+- **Framework**: Spring Boot `3.2.3`
 - **Programming Language**: Java `17`
 - **Build Tool**: Gradle
 
