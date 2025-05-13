@@ -37,13 +37,10 @@ public enum CouponPolicy {
 	public Integer calculateDiscount(Integer amount) {
 		switch (this.type) {
 			case FIXED:
-				// 고정 금액 할인
 				return Math.min(amount, this.discountValue);
 			case RATE:
-				// 비율에 따른 할인 계산
 				int discount = amount * this.discountValue / 100;
 				if (this.maxDiscountAmount != null) {
-					// 최대 할인 금액이 있다면, 그 금액으로 제한
 					discount = Math.min(discount, this.maxDiscountAmount);
 				}
 				return discount;
