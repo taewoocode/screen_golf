@@ -86,4 +86,14 @@ public class PaymentInfo {
 				.build();
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class DiscordNotificationRequest {
+		private String orderId;
+		private Integer amount;
+		private String userName;
+		private Integer pointAmount;
+	}
 }

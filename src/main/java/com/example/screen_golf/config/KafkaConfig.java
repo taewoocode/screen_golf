@@ -17,8 +17,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.example.screen_golf.reservation.dto.ReservationInfo;
-
 @Configuration
 @EnableKafka
 public class KafkaConfig {
@@ -39,11 +37,19 @@ public class KafkaConfig {
 	}
 
 	/**
-	 * 예약 요청용 토픽 자동 생성 설정
+	 * 포인트 적립 요청용 토픽 자동 생성 설정
 	 */
 	@Bean
-	public NewTopic reservationTopic() {
-		return new NewTopic("reservation-requests", 1, (short)1);
+	public NewTopic pointAccumulationTopic() {
+		return new NewTopic("point-accumulation", 1, (short)1);
+	}
+
+	/**
+	 * 디스코드 알림 요청용 토픽 자동 생성 설정
+	 */
+	@Bean
+	public NewTopic discordNotificationTopic() {
+		return new NewTopic("discord-notifications", 1, (short)1);
 	}
 
 	/**
@@ -54,7 +60,7 @@ public class KafkaConfig {
 	 * - JsonSerializer: DTO 객체 전송을 위한 JSON 직렬화
 	 */
 	@Bean
-	public ProducerFactory<String, ReservationInfo.ReservationRequest> producerFactory() {
+	public ProducerFactory<String, Object> producerFactory() {
 		Map<String, Object> configProps = new HashMap<>();
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -71,10 +77,10 @@ public class KafkaConfig {
 	}
 
 	/**
-	 * KafkaTemplate 생성 (DTO 전송용)
+	 * KafkaTemplate 생성 (Object 타입으로 모든 DTO 처리)
 	 */
 	@Bean
-	public KafkaTemplate<String, ReservationInfo.ReservationRequest> kafkaTemplate() {
+	public KafkaTemplate<String, Object> kafkaTemplate() {
 		return new KafkaTemplate<>(producerFactory());
 	}
 } 
