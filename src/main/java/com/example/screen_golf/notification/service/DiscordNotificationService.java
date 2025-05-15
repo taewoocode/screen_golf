@@ -4,8 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.screen_golf.payment.dto.PaymentInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +85,18 @@ public class DiscordNotificationService {
 			.replace("\t", "\\t");
 	}
 
-	public void sendPaymentNotification(String notificationMessage) {
-		sendInfoNotification("💰 결제 성공: " + notificationMessage);
+	/**
+	 * (비동기) 결제 완료 메시지 디스코드
+	 * @param request
+	 */
+	@KafkaListener(topics = "discord-notifications", groupId = "discord-group")
+	@Transactional
+	public void handleDiscordNotification(PaymentInfo.DiscordNotificationRequest request) {
+		log.info("Received discord notification request: {}", request);
+		String notificationMessage = String.format(
+			"주문번호: %s\n금액: %d원\n결제자: %s\n적립 포인트: %d원",
+			request.getOrderId(), request.getAmount(), request.getUserName(), request.getPointAmount()
+		);
+		sendInfoNotification("💰 결제 완료\n" + notificationMessage);
 	}
 }

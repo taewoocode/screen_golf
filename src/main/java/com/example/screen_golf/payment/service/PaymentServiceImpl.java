@@ -13,6 +13,7 @@ import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentConverter;
 import com.example.screen_golf.payment.dto.PaymentInfo;
 import com.example.screen_golf.payment.repository.PaymentRepository;
+import com.example.screen_golf.point.dto.PointChargeInfo;
 import com.example.screen_golf.point.service.PointService;
 import com.example.screen_golf.reservation.dto.ReservationConverter;
 import com.example.screen_golf.reservation.dto.ReservationInfo;
@@ -121,8 +122,10 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	private void accumlatePointToKafka(Integer amount, Payment payment) {
-		PaymentInfo.PointAccumulationRequest pointRequest = new PaymentInfo.PointAccumulationRequest(
-			payment.getUser().getId(), amount);
+		PointChargeInfo.PointChargeRequest pointRequest = new PointChargeInfo.PointChargeRequest(
+			payment.getUser().getId(),
+			(int)(amount * 0.1)
+		);
 		kafkaTemplate.send("point-accumulation", pointRequest);
 		log.info("포인트 적립 요청 전송 - 사용자={}, 적립 금액={}", payment.getUser().getId(), (int)(amount * 0.1));
 	}
