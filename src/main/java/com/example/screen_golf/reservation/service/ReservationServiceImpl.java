@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.screen_golf.common.service.DistributedLockService;
 import com.example.screen_golf.exception.reservation.ReservationNotAvailableException;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
@@ -37,6 +37,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private final UserRepository userRepository;
 	private final PaymentRepository paymentRepository;
 	private final ReservationConverter reservationConverter;
+	private final DistributedLockService lockService;
 
 	private static final LocalTime OPEN_TIME = LocalTime.of(9, 0);  // 오픈 시간: 09:00
 	private static final LocalTime CLOSE_TIME = LocalTime.of(22, 0); // 마감 시간: 22:00
@@ -46,7 +47,15 @@ public class ReservationServiceImpl implements ReservationService {
 	public ReservationInfo.ReservationResponse createReservation(ReservationInfo.ReservationRequest request) {
 		log.info("Received reservation request: {}", request);
 
+		String lockKey = String.format("reservation:%d:%s",
+			request.getRoomId(),
+			request.getStartTime().toString());
+
 		try {
+			if (!lockService.tryLock(lockKey, 3, 10)) {
+				throw new ReservationNotAvailableException("다른 사용자가 예약 중입니다. 잠시 후 다시 시도해주세요.");
+			}
+
 			User user = userRepository.findById(request.getUserId())
 				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -69,7 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
 						.build();
 
 					Reservation savedReservation = reservationRepository.save(reservation);
-					log.info("Reservation created successfully: {}", savedReservation);
+					log.info("예약이 성공적으로 생성되었습니다={}", savedReservation);
 					return ReservationInfo.ReservationResponse.toDto(savedReservation);
 				} else if (payment.getStatus() == PaymentStatus.FAILED) {
 					throw new ReservationNotAvailableException("결제가 실패했습니다. 예약을 취소합니다.");
@@ -86,24 +95,15 @@ public class ReservationServiceImpl implements ReservationService {
 					.build();
 
 				Reservation savedReservation = reservationRepository.save(reservation);
-				log.info("Reservation created successfully: {}", savedReservation);
+				log.info("예약이 성공적으로 생성되었습니다={}", savedReservation);
 				return ReservationInfo.ReservationResponse.toDto(savedReservation);
 			}
 		} catch (Exception e) {
 			log.error("Failed to create reservation: {}", e.getMessage());
 			throw e;
+		} finally {
+			lockService.unlock(lockKey);
 		}
-	}
-
-	/**
-	 * KAFKA LISTENER
-	 * @param request
-	 */
-	@KafkaListener(topics = "reservation-requests", groupId = "reservation-group")
-	@Transactional
-	public void handleReservationRequest(ReservationInfo.ReservationRequest request) {
-		log.info("Received reservation request from Kafka: {}", request);
-		createReservation(request);
 	}
 
 	@Override
