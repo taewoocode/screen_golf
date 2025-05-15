@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.screen_golf.community.domain.Community;
 import com.example.screen_golf.community.domain.CommunityDocument;
+import com.example.screen_golf.community.domain.PostType;
 import com.example.screen_golf.utils.SecurityUtil;
 
 import lombok.Builder;
@@ -157,15 +158,35 @@ public class CommunityConverter {
 
 	public static CommunityDocument toDocument(Community entity) {
 		return CommunityDocument.builder()
-			.id(entity.getId())
+			.id(String.valueOf(entity.getId()))
+			.postNumber(entity.getPostNumber())
+			.replyNumber(entity.getReplyNumber())
+			.parentReplyNumber(entity.getParentReplyNumber())
 			.title(entity.getTitle())
 			.content(entity.getContent())
 			.postType(entity.getPostType().name())
 			.hasAttachment(entity.getHasAttachment())
 			.isBlocked(entity.getIsBlocked())
 			.authorId(entity.getAuthorId())
-			.createdAt(entity.getCreatedAt())
-			.updatedAt(entity.getUpdatedAt())
+			.createdAt(entity.getCreatedAt().toLocalDate())
+			.updatedAt(entity.getUpdatedAt().toLocalDate())
+			.build();
+	}
+
+	/**
+	 * CommunityDocument를 Community로 변환
+	 */
+	public static Community toEntity(CommunityDocument document) {
+		return Community.builder()
+			.postNumber(document.getPostNumber())
+			.replyNumber(document.getReplyNumber())
+			.parentReplyNumber(document.getParentReplyNumber())
+			.title(document.getTitle())
+			.content(document.getContent())
+			.postType(PostType.valueOf(document.getPostType()))
+			.hasAttachment(document.getHasAttachment())
+			.isBlocked(document.getIsBlocked())
+			.authorId(document.getAuthorId())
 			.build();
 	}
 
