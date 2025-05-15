@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.screen_golf.coupon.service.CouponService;
 import com.example.screen_golf.gateway.PaymentGateway;
-import com.example.screen_golf.notification.service.DiscordNotificationService;
 import com.example.screen_golf.payment.domain.Payment;
 import com.example.screen_golf.payment.domain.PaymentStatus;
 import com.example.screen_golf.payment.dto.PaymentConverter;
@@ -17,6 +16,7 @@ import com.example.screen_golf.payment.repository.PaymentRepository;
 import com.example.screen_golf.point.service.PointService;
 import com.example.screen_golf.reservation.dto.ReservationConverter;
 import com.example.screen_golf.reservation.dto.ReservationInfo;
+import com.example.screen_golf.reservation.service.ReservationService;
 import com.example.screen_golf.room.domain.Room;
 import com.example.screen_golf.room.repository.RoomRepository;
 import com.example.screen_golf.user.domain.User;
@@ -38,8 +38,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PointService pointService;
 	private final PaymentGateway paymentGateway;
 	private final PaymentConverter paymentConverter;
-	private final DiscordNotificationService discordNotificationService;
-	private final KafkaTemplate<String, ReservationInfo.ReservationRequest> kafkaTemplate;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final ReservationService reservationService;
 	private final ReservationConverter reservationConverter;
 
 	/**
@@ -78,9 +78,9 @@ public class PaymentServiceImpl implements PaymentService {
 	 * 1. Payment 엔티티 조회
 	 * 2. 카카오페이 결제 승인 요청
 	 * 3. 결제 상태 업데이트 (COMPLETED)
-	 * 4. 포인트 적립 (결제 금액의 10%)
-	 * 5. 예약 생성 요청 (Kafka)
-	 * 6. Discord 알림 전송
+	 * 4. 예약 생성 (동기 처리)
+	 * 5. 포인트 적립 요청 (Kafka)
+	 * 6. 디스코드 알림 요청 (Kafka)
 	 */
 	@Override
 	@Transactional
@@ -98,12 +98,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 			ReservationInfo.ReservationRequest reservationRequest = reservationConverter.toMakeCreateReservation(
 				payment, startTime, endTime);
+			reservationService.createReservation(reservationRequest);
+			log.info("예약 생성 완료={}", reservationRequest);
 
-			kafkaTemplate.send("reservation-requests", reservationRequest);
-			log.info("예약 정보 카프카로 전송={}", reservationRequest);
-			pointService.accumulatePoint(payment.getUser().getId(), amount);
-			log.info("포인트 적립 완료 - 사용자={}, 적립 금액={}", payment.getUser().getId(), (int)(amount * 0.1));
-			sendDiscordMessage(orderId, amount, payment);
+			accumlatePointToKafka(amount, payment);
+			discordNotificateToKafka(orderId, amount, payment);
 
 			return response;
 		} catch (Exception e) {
@@ -114,17 +113,23 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
+	private void discordNotificateToKafka(String orderId, Integer amount, Payment payment) {
+		PaymentInfo.DiscordNotificationRequest notificationRequest = new PaymentInfo.DiscordNotificationRequest(
+			orderId, amount, payment.getUser().getName(), (int)(amount * 0.1));
+		kafkaTemplate.send("discord-notifications", notificationRequest);
+		log.info("디스코드 알림 요청 전송 - 주문번호={}", orderId);
+	}
+
+	private void accumlatePointToKafka(Integer amount, Payment payment) {
+		PaymentInfo.PointAccumulationRequest pointRequest = new PaymentInfo.PointAccumulationRequest(
+			payment.getUser().getId(), amount);
+		kafkaTemplate.send("point-accumulation", pointRequest);
+		log.info("포인트 적립 요청 전송 - 사용자={}, 적립 금액={}", payment.getUser().getId(), (int)(amount * 0.1));
+	}
+
 	@Override
 	@Transactional
 	public PaymentInfo.PaymentResponse cancelPayment(String paymentKey, String cancelReason) {
 		return paymentGateway.cancelPayment(paymentKey, cancelReason);
-	}
-
-	private void sendDiscordMessage(String orderId, Integer amount, Payment payment) {
-		String notificationMessage = String.format(
-			"💰 결제 완료\n" + "주문번호: %s\n" + "금액: %d원\n" + "결제자: %s\n" + "적립 포인트: %d원",
-			orderId, amount, payment.getUser().getName(), (int)(amount * 0.1)
-		);
-		discordNotificationService.sendPaymentNotification(notificationMessage);
 	}
 }
