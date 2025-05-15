@@ -148,7 +148,10 @@ public class CommunityServiceImpl implements CommunityService {
 	@Transactional(readOnly = true)
 	public List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> fuzzySearch(
 		CommunityFuzzySearchInfo.CommunityFuzzySearchRequest request) {
-		List<Community> communities = communityElasticSearchRepository.findByKeywordFuzzy(request.getKeyword());
+		List<CommunityDocument> documents = communityElasticSearchRepository.findByKeywordFuzzy(request.getKeyword());
+		List<Community> communities = documents.stream()
+			.map(CommunityConverter::toEntity)
+			.collect(Collectors.toList());
 
 		return communities.stream()
 			.map(community -> {
@@ -163,5 +166,18 @@ public class CommunityServiceImpl implements CommunityService {
 					.build();
 			})
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 기존 데이터를 Elasticsearch에 재인덱싱
+	 */
+	@Transactional
+	public void reindexAllData() {
+		List<Community> allCommunities = communityRepository.findAll();
+		List<CommunityDocument> documents = allCommunities.stream()
+			.map(CommunityConverter::toDocument)
+			.collect(Collectors.toList());
+
+		communityElasticSearchRepository.saveAll(documents);
 	}
 }
