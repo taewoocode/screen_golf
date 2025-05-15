@@ -50,4 +50,10 @@ public interface CommunityService {
 	@Transactional(readOnly = true)
 	List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> fuzzySearch(
 		CommunityFuzzySearchInfo.CommunityFuzzySearchRequest request);
+
+	/**
+	 * 기존 데이터를 Elasticsearch에 재인덱싱
+	 */
+	@Transactional
+	void reindexAllData();
 }

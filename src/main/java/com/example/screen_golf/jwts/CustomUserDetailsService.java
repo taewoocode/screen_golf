@@ -20,16 +20,15 @@ public class CustomUserDetailsService implements org.springframework.security.co
 
 	@Override
 	public UserDetails loadUserByUsername(String username) {
-		com.example.screen_golf.user.domain.User user = userRepository.findByEmail(username)
-			.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+		com.example.screen_golf.user.domain.User user = userRepository.findById(Long.parseLong(username))
+			.orElseThrow(() -> new UsernameNotFoundException("해당 ID의 유저를 찾을 수 없습니다.: " + username));
 
 		if (user.getStatus() != UserStatus.ACTIVE) {
-			throw new UsernameNotFoundException("User is not active");
+			throw new UsernameNotFoundException("유저가 활동중이지 않습니다.");
 		}
 
 		List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
 
-		// userId를 CustomUserDetails 생성자에 추가
 		return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), authorities);
 	}
 

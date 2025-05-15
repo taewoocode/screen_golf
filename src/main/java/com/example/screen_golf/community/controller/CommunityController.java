@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.screen_golf.community.dto.CommunityAdvancedInfo;
+import com.example.screen_golf.community.dto.CommunityFuzzySearchInfo;
 import com.example.screen_golf.community.dto.CommunitySaveInfo;
 import com.example.screen_golf.community.dto.CommunitySearchListInfo;
 import com.example.screen_golf.community.dto.CommunityUpdateInfo;
-import com.example.screen_golf.community.dto.CommunityFuzzySearchInfo;
 import com.example.screen_golf.community.service.CommunityService;
 import com.example.screen_golf.swagger.SwaggerDocs;
 import com.example.screen_golf.utils.SecurityUtil;
@@ -140,5 +140,18 @@ public class CommunityController {
 	) {
 		List<CommunityFuzzySearchInfo.CommunityFuzzySearchResponse> results = communityService.fuzzySearch(request);
 		return ResponseEntity.ok(results);
+	}
+
+	/**
+	 * Elasticsearch 재인덱싱
+	 */
+	@Operation(
+		summary = "Elasticsearch 재인덱싱",
+		description = "기존 데이터를 Elasticsearch에 재인덱싱합니다."
+	)
+	@PostMapping("/reindex")
+	public ResponseEntity<Void> reindexData() {
+		communityService.reindexAllData();
+		return ResponseEntity.ok().build();
 	}
 }

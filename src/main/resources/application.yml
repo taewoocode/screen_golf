@@ -22,7 +22,11 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
-
+          batch_size: 1000
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+  
   data:
     redis:
       host: ${REDIS_HOST}
