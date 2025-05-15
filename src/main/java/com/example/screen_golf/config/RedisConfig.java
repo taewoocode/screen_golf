@@ -1,5 +1,8 @@
 package com.example.screen_golf.config;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -38,5 +41,17 @@ public class RedisConfig {
 		redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 		redisTemplate.afterPropertiesSet();
 		return redisTemplate;
+	}
+
+	/**
+	 * 분산락 Bean
+	 * @return
+	 */
+	@Bean
+	public RedissonClient redissonClient() {
+		Config config = new Config();
+		config.useSingleServer()
+			.setAddress("redis://" + redisHost + ":" + redisPort);
+		return Redisson.create(config);
 	}
 } 
