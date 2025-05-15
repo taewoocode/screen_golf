@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
 		String loginKey = LOGIN_STATUS_PREFIX + userId;
 		String refreshKey = REFRESH_TOKEN_PREFIX + userId;
 		redisUtil.setDataExpire(loginKey, STATUS_INACTIVE, LOGIN_STATUS_EXPIRATION);
-		redisUtil.deleteData(refreshKey);
+		redisUtil.setDataExpire(refreshKey, STATUS_INACTIVE, jwtProvider.getRefreshTokenExpiration());
 
 		log.info("User {} logged out", userId);
 	}
