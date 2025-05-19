@@ -11,7 +11,6 @@ import com.example.screen_golf.community.domain.CommunityDocument;
 
 public interface CommunityElasticSearchRepository
 	extends ElasticsearchRepository<CommunityDocument, String>, CustomCommunitySearchRepository {
-	// 기본 CRUD 메서드들은 ElasticsearchRepository에서 제공
 
 	/**
 	 * 기본 키워드 검색
