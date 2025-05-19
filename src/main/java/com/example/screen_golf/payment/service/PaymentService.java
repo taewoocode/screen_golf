@@ -19,11 +19,11 @@ public interface PaymentService {
 	 * @param paymentKey 결제 키
 	 * @param orderId 주문 ID
 	 * @param amount 결제 금액
+	 * @param pgToken 결제 토큰
 	 * @return 결제 처리 결과
 	 */
 	@Transactional
-	PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
-		LocalDateTime startTime, LocalDateTime endTime);
+	PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount, String pgToken);
 
 	/**
 	 * 결제 취소를 처리합니다.
