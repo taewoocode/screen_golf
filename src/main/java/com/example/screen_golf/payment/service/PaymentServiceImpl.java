@@ -1,7 +1,5 @@
 package com.example.screen_golf.payment.service;
 
-import java.time.LocalDateTime;
-
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,20 +56,20 @@ public class PaymentServiceImpl implements PaymentService {
 		Room room = roomRepository.findById(request.getRoomId())
 			.orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-		Integer finalAmount = request.getOriginalAmount();
+		Integer amount = request.getOriginalAmount();
 
 		if (request.getCouponId() != null) {
-			finalAmount = couponService.validateAndUseCoupon(request.getCouponId(), finalAmount);
+			amount = couponService.validateAndUseCoupon(request.getCouponId(), amount);
 		}
 
 		if (request.getUsePoint() > 0) {
-			finalAmount = pointService.validateAndUsePoint(request.getUserId(), request.getUsePoint(), finalAmount);
+			amount = pointService.validateAndUsePoint(request.getUserId(), request.getUsePoint(), amount);
 		}
 
-		Payment payment = paymentConverter.makePaymentEntity(user, room, finalAmount);
-		Payment savedPayment = paymentRepository.save(payment);
+		Payment payment = paymentConverter.makePaymentEntity(user, room, amount, request.getStartTime(),
+			request.getEndTime());
 
-		return paymentGateway.requestPayment(savedPayment);
+		return paymentGateway.requestPayment(payment);
 	}
 
 	/**
@@ -86,19 +84,20 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional
 	public PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
-		LocalDateTime startTime, LocalDateTime endTime) {
+		String pgToken) {
 		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
 			.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
 
 		try {
-			PaymentInfo.PaymentResponse response = paymentGateway.approvePayment(paymentKey, orderId, amount);
+			PaymentInfo.PaymentResponse response = paymentGateway.approvePayment(paymentKey, orderId, amount, pgToken);
 
 			payment.setStatus(PaymentStatus.COMPLETED);
 			payment.setMessage("결제가 완료되었습니다.");
 			paymentRepository.save(payment);
 
 			ReservationInfo.ReservationRequest reservationRequest = reservationConverter.toMakeCreateReservation(
-				payment, startTime, endTime);
+				payment, payment.getReservationStartTime(), payment.getReservationEndTime());
+
 			reservationService.createReservation(reservationRequest);
 			log.info("예약 생성 완료={}", reservationRequest);
 

@@ -33,7 +33,6 @@ public class KakaoPayGateway implements PaymentGateway {
 
 	@Override
 	public PaymentInfo.PaymentResponse requestPayment(Payment payment) {
-		// 1. 카카오페이 요청 생성
 		KakaoPayReadyRequest kakaoRequest = KakaoPayReadyRequest.builder()
 			.cid(cid)
 			.partner_order_id(payment.getId().toString())
@@ -47,7 +46,6 @@ public class KakaoPayGateway implements PaymentGateway {
 			.fail_url("http://localhost:8080/api/v1/payments/fail")
 			.build();
 
-		// 2. 카카오페이 API 호출
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", "KakaoAK " + secretKey);
 		headers.set("Content-type", "application/json");
@@ -59,12 +57,10 @@ public class KakaoPayGateway implements PaymentGateway {
 			KakaoPayReadyResponse.class
 		);
 
-		// 3. Payment 엔티티 업데이트
 		payment.completePayment(kakaoResponse.getTid());
 		payment.setStatus(PaymentStatus.PENDING);
 		paymentRepository.save(payment);
 
-		// 4. 응답 반환
 		return PaymentInfo.PaymentResponse.builder()
 			.paymentId(payment.getId())
 			.status(payment.getStatus())
@@ -74,18 +70,17 @@ public class KakaoPayGateway implements PaymentGateway {
 	}
 
 	@Override
-	public PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount) {
-		// 1. Payment 조회
+	public PaymentInfo.PaymentResponse approvePayment(String paymentKey, String orderId, Integer amount,
+		String pgToken) {
 		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
 			.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
 
-		// 2. 카카오페이 승인 요청
 		KakaoPayApproveRequest approveRequest = KakaoPayApproveRequest.builder()
 			.cid(cid)
 			.tid(paymentKey)
 			.partner_order_id(orderId)
 			.partner_user_id(payment.getUser().getId().toString())
-			.pg_token("pg_token") // 실제로는 클라이언트에서 받아와야 함
+			.pg_token(pgToken)
 			.build();
 
 		HttpHeaders headers = new HttpHeaders();
@@ -99,11 +94,9 @@ public class KakaoPayGateway implements PaymentGateway {
 			KakaoPayApproveResponse.class
 		);
 
-		// 3. Payment 엔티티 업데이트
 		payment.setStatus(PaymentStatus.COMPLETED);
 		paymentRepository.save(payment);
 
-		// 4. 응답 반환
 		return PaymentInfo.PaymentResponse.builder()
 			.paymentId(payment.getId())
 			.status(payment.getStatus())
@@ -113,11 +106,9 @@ public class KakaoPayGateway implements PaymentGateway {
 
 	@Override
 	public PaymentInfo.PaymentResponse cancelPayment(String paymentKey, String cancelReason) {
-		// 1. Payment 조회
 		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
 			.orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다."));
 
-		// 2. 카카오페이 취소 요청
 		KakaoPayCancelRequest cancelRequest = KakaoPayCancelRequest.builder()
 			.cid(cid)
 			.tid(paymentKey)
@@ -137,11 +128,9 @@ public class KakaoPayGateway implements PaymentGateway {
 			KakaoPayCancelResponse.class
 		);
 
-		// 3. Payment 엔티티 업데이트
-		payment.setStatus(PaymentStatus.CANCELED);
+		// payment.setStatus(PaymentStatus.CANCELED);
 		paymentRepository.save(payment);
 
-		// 4. 응답 반환
 		return PaymentInfo.PaymentResponse.builder()
 			.paymentId(payment.getId())
 			.status(payment.getStatus())

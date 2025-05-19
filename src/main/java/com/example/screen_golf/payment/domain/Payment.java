@@ -66,6 +66,12 @@ public class Payment {
 	@Column
 	private String message;
 
+	@Column(name = "reservation_start_time")
+	private LocalDateTime reservationStartTime;
+
+	@Column(name = "reservation_end_time")
+	private LocalDateTime reservationEndTime;
+
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
@@ -76,7 +82,7 @@ public class Payment {
 
 	@Builder
 	public Payment(User user, Room room, Integer amount, PaymentStatus status, Coupon coupon,
-		String paymentMethod, String message) {
+		String paymentMethod, String message, LocalDateTime reservationStartTime, LocalDateTime reservationEndTime) {
 		this.user = user;
 		this.room = room;
 		this.amount = amount;
@@ -84,6 +90,8 @@ public class Payment {
 		this.coupon = coupon;
 		this.paymentMethod = paymentMethod;
 		this.message = message;
+		this.reservationStartTime = reservationStartTime;
+		this.reservationEndTime = reservationEndTime;
 	}
 
 	public void complete() {
@@ -94,9 +102,9 @@ public class Payment {
 		return PaymentStatus.FAILED;
 	}
 
-	public void refund() {
-		this.status = PaymentStatus.CANCELED;
-	}
+	// public void refund() {
+	// 	this.status = PaymentStatus.CANCELED;
+	// }
 
 	public void completePayment(String paymentKey) {
 		this.status = PaymentStatus.COMPLETED;
