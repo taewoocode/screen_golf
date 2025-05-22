@@ -1,0 +1,94 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "synonym_filter": {
+          "type": "synonym",
+          "synonyms": [
+            "직장인, 회사원, 사원",
+            "골프, 스크린골프"
+          ]
+        }
+      },
+      "analyzer": {
+        "ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "ik_max_word": {
+          "type": "custom",
+          "tokenizer": "ik_max_word"
+        },
+        "edge_ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "edge_ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "nori_analyzer": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer",
+          "filter": [
+            "synonym_filter"
+          ]
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 3,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        },
+        "ik_max_word": {
+          "type": "ik_max_word"
+        },
+        "edge_ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        },
+        "nori_tokenizer": {
+          "type": "nori_tokenizer"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "nori_analyzer",
+        "search_analyzer": "nori_analyzer"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "nori_analyzer",
+        "search_analyzer": "nori_analyzer"
+      },
+      "postType": {
+        "type": "keyword"
+      },
+      "authorId": {
+        "type": "long"
+      },
+      "createdAt": {
+        "type": "date"
+      },
+      "isBlocked": {
+        "type": "keyword"
+      }
+    }
+  }
+}
